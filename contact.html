@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>যোগাযোগ — Aimers</title>
+<meta name="description" content="Aimers-এর সাথে যোগাযোগ করো ইমেইল, ইউটিউব বা ফেসবুকের মাধ্যমে।">
+<link rel="canonical" href="https://aimers-site.vercel.app/contact.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="যোগাযোগ — Aimers">
+<meta property="og:description" content="Aimers-এর সাথে যোগাযোগ করো ইমেইল, ইউটিউব বা ফেসবুকের মাধ্যমে।">
+<meta property="og:locale" content="bn_BD">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .contact-grid{
+    padding:0 6vw 10vh;
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:18px;
+    max-width:900px;
+  }
+  .contact-card{
+    background:var(--panel); border:1px solid var(--line); padding:26px;
+    display:flex; flex-direction:column; gap:14px; transition:transform .3s, border-color .3s, box-shadow .3s;
+  }
+  .contact-card:hover{ transform:translateY(-6px); border-color:var(--accent); box-shadow:0 0 26px -6px var(--accent); }
+  .contact-card .subj-icon{ margin-bottom:0; }
+  .contact-card h4{ font-size:18px; font-weight:700; }
+  .contact-card .val{ font-family:'Rajdhani',sans-serif; font-size:14px; color:var(--muted); word-break:break-word; }
+  .contact-card .go{ font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:600; color:var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+  <nav>
+    <a href="index.html#classes">ক্লাসসমূহ</a>
+    <a href="about.html">সম্পর্কে</a>
+    <a href="contact.html">যোগাযোগ</a>
+    <a class="cta-btn" href="index.html#classes">শুরু করো</a>
+  </nav>
+</header>
+
+<div class="breadcrumb tech">
+  <a href="index.html">AIMERS</a>
+  <span class="sep">/</span>
+  <span class="current">যোগাযোগ</span>
+</div>
+
+<div class="page-head">
+  <div class="eyebrow tech">GET IN TOUCH</div>
+  <h1>যোগাযোগ করো</h1>
+  <p>প্রশ্ন, পরামর্শ বা কোনো ভিডিওতে সমস্যা পেলে — নিচের যেকোনো মাধ্যমে জানাতে পারো।</p>
+</div>
+
+<div class="contact-grid">
+  <a class="contact-card" style="--accent:#00f0ff" href="mailto:amraaimers@gmail.com">
+    <div class="subj-icon">✉</div>
+    <h4>ইমেইল</h4>
+    <div class="val">amraaimers@gmail.com</div>
+    <div class="go">মেইল করো →</div>
+  </a>
+
+  <a class="contact-card" style="--accent:#ff2e9a" href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">
+    <div class="subj-icon">▶</div>
+    <h4>ইউটিউব চ্যানেল</h4>
+    <div class="val">@AIMERS-24h</div>
+    <div class="go">চ্যানেলে যাও →</div>
+  </a>
+
+  <a class="contact-card" style="--accent:#9d4dff" href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener">
+    <div class="subj-icon">f</div>
+    <h4>ফেসবুক পেইজ</h4>
+    <div class="val">facebook.com/aimer24h</div>
+    <div class="go">পেইজে যাও →</div>
+  </a>
+</div>
+
+<footer>
+  <div>© ২০২৬ Aimers</div>
+  <div class="tech">MADE IN BANGLADESH</div>
+</footer>
+
+</body>
+</html>

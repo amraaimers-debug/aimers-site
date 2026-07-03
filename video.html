@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ভিডিও দেখো — Aimers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .watch-wrap{
+    display:grid; grid-template-columns:1fr 340px; gap:22px;
+    padding:4vh 6vw 12vh; align-items:start;
+  }
+  .watch-main .player-mock{ padding:0; overflow:hidden; }
+  .watch-main .player-screen{ height:min(52vh, 460px); }
+  .watch-main .player-mock .player-top{ padding:14px 16px 0; }
+  .watch-main .player-mock .player-bar{ padding:0 16px 14px; }
+  .watch-title{ margin-top:20px; font-size:22px; font-weight:700; }
+  .watch-meta{ margin-top:8px; font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--muted); letter-spacing:0.5px; }
+
+  .empty-note{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:var(--muted); text-align:center; padding:0 20px;
+  }
+  .empty-note .ring{
+    width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--cyan);
+    display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--cyan);
+  }
+  .empty-note .tech{ font-size:12px; }
+
+  .chapter-panel{
+    background:var(--panel); border:1px solid var(--line); padding:16px;
+    max-height:640px; overflow-y:auto;
+  }
+  .chapter-panel h4{
+    font-family:'Rajdhani',sans-serif; font-size:14px; letter-spacing:1px; color:var(--muted);
+    padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:6px;
+  }
+  .chap-row{
+    display:flex; align-items:center; gap:12px; padding:12px 8px; cursor:pointer;
+    border-left:2px solid transparent; transition:background .2s, border-color .2s;
+  }
+  .chap-row:hover{ background:rgba(0,240,255,0.05); }
+  .chap-row.active{ background:rgba(0,240,255,0.08); border-left-color:var(--cyan); }
+  .chap-row .num{ font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); width:24px; flex-shrink:0; }
+  .chap-row.active .num{ color:var(--cyan); }
+  .chap-row .t{ font-size:13.5px; color:var(--text); line-height:1.5; }
+  .chap-row .dot-empty{
+    margin-left:auto; width:6px; height:6px; border-radius:50%; background:var(--line); flex-shrink:0;
+  }
+  .chap-row.active .dot-empty{ background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+
+  @media (max-width:900px){
+    .watch-wrap{ grid-template-columns:1fr; padding:3vh 5vw 8vh; }
+    .chapter-panel{ max-height:340px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+  <nav>
+    <a href="index.html#classes">ক্লাসসমূহ</a>
+    <a href="#">সম্পর্কে</a>
+    <a href="#">যোগাযোগ</a>
+    <button class="cta-btn">শুরু করো</button>
+  </nav>
+</header>
+
+<div class="breadcrumb tech">
+  <a href="index.html">AIMERS</a>
+  <span class="sep">/</span>
+  <a href="#" id="crumbClass">ক্লাস</a>
+  <span class="sep">/</span>
+  <span class="current" id="crumbSubject">সাবজেক্ট</span>
+</div>
+
+<div class="watch-wrap" id="watchWrap">
+  <div id="loadState" class="state-screen" style="grid-column:1/-1;">
+    <div class="tech blink">LOADING DATA</div>
+    <p>Google Sheet থেকে ভিডিও তথ্য লোড হচ্ছে...</p>
+  </div>
+  <div class="watch-main" id="watchMain" style="display:none;">
+    <div class="player-mock">
+      <div class="player-top">
+        <span class="pulse-badge"></span>
+        <span class="tech player-tag">NOW PLAYING</span>
+        <span class="tech player-ch" id="playerTag">CLASS_00 · সাবজেক্ট</span>
+      </div>
+      <div class="player-screen" id="playerScreen">
+        <div class="empty-note">
+          <div class="ring">▶</div>
+          <div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div>
+        </div>
+      </div>
+    </div>
+    <div class="watch-title" id="watchTitle">অধ্যায় শিরোনাম</div>
+    <div class="watch-meta tech" id="watchMeta">CHAPTER 01 OF 00</div>
+  </div>
+
+  <div class="chapter-panel" id="chapterPanel" style="display:none;">
+    <h4 class="tech">চ্যাপ্টার লিস্ট</h4>
+    <div id="chapterList"></div>
+  </div>
+</div>
+
+<footer>
+  <div>© ২০২৬ Aimers</div>
+  <div class="tech">MADE IN BANGLADESH</div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const classId = params.get('class');
+  const subjectKey = params.get('subject');
+  const loadState = document.getElementById('loadState');
+
+  async function main(){
+    try{
+      await loadData();
+    } catch(err){
+      loadState.className = 'state-screen error';
+      loadState.innerHTML = `
+        <div class="tech">লোড করা যায়নি</div>
+        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
+        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
+      `;
+      return;
+    }
+
+    const cls = getClass(classId);
+    const subj = subjectKey ? getSubject(subjectKey) : null;
+
+    if(!cls || !subj || !cls.subjects.includes(subjectKey)){
+      window.location.href = 'index.html';
+      return;
+    }
+
+    loadState.style.display = 'none';
+    document.getElementById('watchMain').style.display = '';
+    document.getElementById('chapterPanel').style.display = '';
+
+    document.getElementById('crumbClass').textContent = `ক্লাস ${cls.num}`;
+    document.getElementById('crumbClass').href = `subject.html?class=${cls.id}`;
+    document.getElementById('crumbSubject').textContent = subj.name;
+    document.title = `${subj.name} — ক্লাস ${cls.num} — Aimers`;
+
+    const chapters = getChapters(cls.id, subjectKey);
+    const listEl = document.getElementById('chapterList');
+    const screenEl = document.getElementById('playerScreen');
+
+    function renderChapter(index){
+      const ch = chapters[index];
+      document.getElementById('playerTag').textContent = `CLASS_${cls.id.padStart(2,'0')} · ${subj.name}`;
+      document.getElementById('watchTitle').textContent = ch.title;
+      document.getElementById('watchMeta').textContent = `CHAPTER ${String(index+1).padStart(2,'0')} OF ${String(chapters.length).padStart(2,'0')}`;
+
+      screenEl.innerHTML = ch.youtubeId
+        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${ch.youtubeId}" title="${ch.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+        : `<div class="empty-note"><div class="ring">▶</div><div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div></div>`;
+
+      [...listEl.children].forEach((row, i) => row.classList.toggle('active', i === index));
+    }
+
+    chapters.forEach((ch, i) => {
+      const row = document.createElement('div');
+      row.className = 'chap-row';
+      row.tabIndex = 0;
+      row.innerHTML = `
+        <span class="num tech">${String(i+1).padStart(2,'0')}</span>
+        <span class="t">${ch.title}</span>
+        <span class="dot-empty"></span>
+      `;
+      row.addEventListener('click', () => renderChapter(i));
+      row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderChapter(i); });
+      listEl.appendChild(row);
+    });
+
+    renderChapter(0);
+  }
+
+  main();
+</script>
+
+</body>
+</html>

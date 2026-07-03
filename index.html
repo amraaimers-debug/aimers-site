@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aimers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+  <nav>
+    <a href="#classes">ক্লাসসমূহ</a>
+    <a href="#">সম্পর্কে</a>
+    <a href="#">যোগাযোগ</a>
+    <button class="cta-btn">শুরু করো</button>
+  </nav>
+</header>
+
+<div class="hero">
+  <div>
+    <div class="eyebrow tech">CLASS_05 → CLASS_12</div>
+    <h1>তোমার ক্লাস বেছে নাও,<br><span class="glow">শেখা</span> শুরু করো আজই</h1>
+    <p>চ্যাপ্টার অনুযায়ী সাজানো ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, আইসিটি, বিজ্ঞান, সব একজায়গায়।</p>
+    <div class="hero-ctas">
+      <a class="cta-btn" href="#classes">ক্লাস দেখা শুরু করো</a>
+      <a class="ghost-btn tech" href="#classes">সব ক্লাস দেখো →</a>
+    </div>
+  </div>
+
+  <div class="player-mock">
+    <span class="corner c1"></span><span class="corner c2"></span>
+    <div class="player-top">
+      <span class="pulse-badge"></span>
+      <span class="tech player-tag">NOW PLAYING</span>
+      <span class="tech player-ch">CLASS_05 · গণিত</span>
+    </div>
+    <div class="player-screen">
+      <div class="play-btn">▶</div>
+      <div class="scanline"></div>
+    </div>
+    <div class="player-bar">
+      <div class="progress"><div class="fill"></div></div>
+      <div class="time tech">০০:০০ / --:--</div>
+    </div>
+    <div class="chapter-list">
+      <div class="chap active"><span class="tech">০১</span>গুণ</div>
+    </div>
+  </div>
+</div>
+
+<section class="section-wrap" id="classes">
+  <div class="section-head">
+    <h2>ক্লাস অনুযায়ী ব্রাউজ করো</h2>
+    <span class="tech" id="subjCount">LOADING...</span>
+  </div>
+  <div id="loadState" class="state-screen">
+    <div class="tech blink">LOADING DATA</div>
+    <p>Google Sheet থেকে ক্লাসের তালিকা লোড হচ্ছে...</p>
+  </div>
+  <div class="grid" id="classGrid"></div>
+</section>
+
+<footer>
+  <div>© ২০২৬ Aimers</div>
+  <div class="tech">MADE IN BANGLADESH</div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+  const accents = ['#00f0ff','#ff2e9a','#9d4dff','#ffd23f'];
+  const grid = document.getElementById('classGrid');
+  const loadState = document.getElementById('loadState');
+  const subjCount = document.getElementById('subjCount');
+
+  async function main(){
+    try{
+      await loadData();
+    } catch(err){
+      loadState.className = 'state-screen error';
+      loadState.innerHTML = `
+        <div class="tech">লোড করা যায়নি</div>
+        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
+        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
+      `;
+      return;
+    }
+
+    loadState.style.display = 'none';
+    const readyCount = CLASSES.filter(c => c.ready).length;
+    subjCount.textContent = `${readyCount} CLASSES · MORE INCOMING`;
+
+    CLASSES.forEach((c, i) => {
+      const accent = accents[i % accents.length];
+      const subjectLabel = c.ready
+        ? c.subjects.map(k => getSubject(k).name).join(' · ')
+        : 'শীঘ্রই যুক্ত হবে';
+
+      const card = document.createElement('div');
+      card.className = 'card' + (c.ready ? '' : ' coming');
+      card.style.setProperty('--accent', accent);
+      card.tabIndex = 0;
+      card.innerHTML = `
+        ${c.ready ? '' : '<div class="badge">শীঘ্রই</div>'}
+        <div class="id tech">${c.roll}</div>
+        <h3>ক্লাস ${c.num}</h3>
+        <div class="sub">${subjectLabel}</div>
+        ${c.ready ? '<div class="go">সাবজেক্ট দেখো →</div>' : ''}
+      `;
+      if(c.ready){
+        card.addEventListener('click', () => { window.location.href = `subject.html?class=${c.id}`; });
+        card.addEventListener('keydown', (e) => { if(e.key === 'Enter') window.location.href = `subject.html?class=${c.id}`; });
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  main();
+</script>
+
+</body>
+</html>

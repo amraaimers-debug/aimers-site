@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>সাবজেক্ট বেছে নাও — Aimers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+  <nav>
+    <a href="index.html#classes">ক্লাসসমূহ</a>
+    <a href="#">সম্পর্কে</a>
+    <a href="#">যোগাযোগ</a>
+    <button class="cta-btn">শুরু করো</button>
+  </nav>
+</header>
+
+<div class="breadcrumb tech">
+  <a href="index.html">AIMERS</a>
+  <span class="sep">/</span>
+  <span class="current" id="crumbClass">ক্লাস</span>
+</div>
+
+<div class="page-head">
+  <div class="eyebrow tech" id="classTag">CLASS_00</div>
+  <h1 id="pageTitle">সাবজেক্ট বেছে নাও</h1>
+  <p>এই ক্লাসের যেই সাবজেক্টে ক্লিক করবে, সেটার চ্যাপ্টার-ভিত্তিক ভিডিও লিস্ট খুলে যাবে।</p>
+</div>
+
+<section class="section-wrap">
+  <div class="section-head">
+    <h2>সাবজেক্ট সমূহ</h2>
+    <span class="tech" id="subjCount">LOADING...</span>
+  </div>
+  <div id="loadState" class="state-screen">
+    <div class="tech blink">LOADING DATA</div>
+    <p>Google Sheet থেকে সাবজেক্টের তালিকা লোড হচ্ছে...</p>
+  </div>
+  <div class="grid" id="subjectGrid"></div>
+</section>
+
+<footer>
+  <div>© ২০২৬ Aimers</div>
+  <div class="tech">MADE IN BANGLADESH</div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const classId = params.get('class');
+  const grid = document.getElementById('subjectGrid');
+  const loadState = document.getElementById('loadState');
+
+  async function main(){
+    try{
+      await loadData();
+    } catch(err){
+      loadState.className = 'state-screen error';
+      loadState.innerHTML = `
+        <div class="tech">লোড করা যায়নি</div>
+        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
+        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
+      `;
+      return;
+    }
+
+    const cls = getClass(classId);
+    if(!cls || !cls.ready){
+      window.location.href = 'index.html';
+      return;
+    }
+
+    loadState.style.display = 'none';
+    document.getElementById('crumbClass').textContent = `ক্লাস ${cls.num}`;
+    document.getElementById('classTag').textContent = `CLASS_${cls.id.padStart(2,'0')}`;
+    document.getElementById('pageTitle').textContent = `ক্লাস ${cls.num} — সাবজেক্ট বেছে নাও`;
+    document.getElementById('subjCount').textContent = `${cls.subjects.length} SUBJECTS`;
+    document.title = `ক্লাস ${cls.num} সাবজেক্ট — Aimers`;
+
+    cls.subjects.forEach(key => {
+      const s = getSubject(key);
+      const count = placeholderVideoCount(cls.id, key);
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.setProperty('--accent', s.accent);
+      card.tabIndex = 0;
+      card.innerHTML = `
+        <div class="subj-icon">${s.icon}</div>
+        <h3>${s.name}</h3>
+        <div class="count"><span class="n">${count}</span>টি ভিডিও</div>
+        <div class="go">চ্যাপ্টার দেখো →</div>
+      `;
+      card.addEventListener('click', () => {
+        window.location.href = `video.html?class=${cls.id}&subject=${key}`;
+      });
+      card.addEventListener('keydown', (e) => { if(e.key === 'Enter') card.click(); });
+      grid.appendChild(card);
+    });
+  }
+
+  main();
+</script>
+
+</body>
+</html>

@@ -227,19 +227,38 @@ footer{
 
 @media (max-width:640px){
   header{ padding:18px 5vw; }
-  nav a{ display:none; }
+  nav{ display:none; }
   .breadcrumb{ padding:18px 5vw 0; }
   .hero{ padding:6vh 5vw 6vh; }
   .page-head{ padding:4vh 5vw 2vh; }
   .section-wrap{ padding:4vh 5vw 10vh; }
+}
+.menu-toggle{
+  display:none; background:none; border:1px solid var(--line); color:var(--text);
+  font-size:16px; padding:7px 12px; cursor:pointer; transition:border-color .2s, color .2s;
+}
+.menu-toggle:hover{ border-color:var(--cyan); color:var(--cyan); }
+.mobile-nav{
+  display:none; flex-direction:column; border-bottom:1px solid var(--line); background:var(--bg2);
+}
+.mobile-nav.open{ display:flex; }
+.mobile-nav a{
+  padding:15px 6vw; font-family:'Rajdhani',sans-serif; font-size:14.5px; font-weight:600;
+  color:var(--muted); border-top:1px solid var(--line); transition:color .2s;
+}
+.mobile-nav a:hover{ color:var(--cyan); }
+.mobile-nav a.mobile-cta{ color:var(--yellow); }
+@media (max-width:640px){
+  .menu-toggle{ display:block; }
 }
 @media (prefers-reduced-motion: reduce){
   .card, .pulse-badge, .scanline{ animation:none; transition:none; }
 }
 /* SEARCH + CHIPS (hero) */
 .hero-search{
-  margin-top:30px; display:flex; gap:10px; max-width:440px;
+  margin-top:30px; display:flex; gap:10px; max-width:440px; flex-wrap:wrap;
 }
+.hero-search input{ min-width:200px; }
 .hero-search input{
   flex:1; background:var(--panel); border:1px solid var(--line); color:var(--text);
   padding:13px 16px; font-family:'Hind Siliguri',sans-serif; font-size:14px; outline:none;

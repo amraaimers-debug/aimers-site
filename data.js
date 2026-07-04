@@ -6,7 +6,9 @@
 //
 // Sheet-এর ট্যাব দুইটা হতে হবে ঠিক এই নামে: "Classes" এবং "Chapters"
 // Classes ট্যাবের কলাম: id, num, roll, ready, subjects
-// Chapters ট্যাবের কলাম: classId, subject, title, youtube
+// Chapters ট্যাবের কলাম: classId, subject, chapter, topic, youtube
+//   chapter = অধ্যায়ের নাম (যেমন: ১ম অধ্যায়)
+//   topic   = টপিকের নাম (যেমন: গুণ)
 // ============================================================
 
 const SHEET_ID = '1mZAuNS3Qfz6OmihoDQaTSiYT6iNuroqK12seZ6zVqpw';
@@ -101,14 +103,33 @@ async function loadData(){
     if(!r.classId || !r.subject) return;
     const key = `${r.classId}_${r.subject}`;
     if(!CHAPTERS[key]) CHAPTERS[key] = [];
-    const entry = { title: r.title || 'শিরোনাম নেই', youtubeId: extractYoutubeId(r.youtube) };
+    const entry = {
+      chapter: r.chapter || 'অধ্যায়',
+      title: r.topic || r.title || 'শিরোনাম নেই', // r.title রাখা হয়েছে পুরনো Sheet ফরম্যাটের সাথে সামঞ্জস্যের জন্য
+      youtubeId: extractYoutubeId(r.youtube),
+    };
     CHAPTERS[key].push(entry);
     if(entry.youtubeId){
-      ALL_CHAPTERS.push({ classId: r.classId, subjectKey: r.subject, title: entry.title, youtubeId: entry.youtubeId });
+      ALL_CHAPTERS.push({ classId: r.classId, subjectKey: r.subject, chapter: entry.chapter, title: entry.title, youtubeId: entry.youtubeId });
     }
   });
 
   DATA_LOADED = true;
+}
+
+// এই সাবজেক্টের সব অধ্যায়ের নাম, Sheet-এ যে ক্রমে প্রথম দেখা গেছে সেই ক্রমে (ডুপ্লিকেট বাদে)
+function getChapterNames(classId, subjectKey){
+  const key = `${classId}_${subjectKey}`;
+  const items = CHAPTERS[key] || [];
+  const seen = [];
+  items.forEach(it => { if(!seen.includes(it.chapter)) seen.push(it.chapter); });
+  return seen;
+}
+
+// একটা নির্দিষ্ট অধ্যায়ের ভিতরের সব টপিক
+function getTopics(classId, subjectKey, chapterName){
+  const key = `${classId}_${subjectKey}`;
+  return (CHAPTERS[key] || []).filter(it => it.chapter === chapterName);
 }
 
 // শেষ N টা real ভিডিও (youtubeId বসানো আছে এমন) — সবচেয়ে সাম্প্রতিক আগে
@@ -118,13 +139,6 @@ function getRecentVideos(n = 4){
 
 function getClass(id){
   return CLASSES.find(c => c.id === id);
-}
-
-// classId + subjectKey দিয়ে চ্যাপ্টার লিস্ট বের করে।
-// Sheet-এ এন্ট্রি না থাকলে খালি লিস্ট রিটার্ন করে — কোনো fake টাইটেল বানায় না।
-function getChapters(classId, subjectKey){
-  const key = `${classId}_${subjectKey}`;
-  return CHAPTERS[key] || [];
 }
 
 // আসল ভিডিও কাউন্ট — Sheet-এ যা আছে ঠিক তাই, কোনো এলোমেলো সংখ্যা বানানো হয় না

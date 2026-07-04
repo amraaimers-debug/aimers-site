@@ -27,9 +27,23 @@
     <a href="#classes">ক্লাসসমূহ</a>
     <a href="about.html">সম্পর্কে</a>
     <a href="contact.html">যোগাযোগ</a>
-    <button class="cta-btn">শুরু করো</button>
+    <a class="cta-btn" href="#classes">শুরু করো</a>
   </nav>
+  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
 </header>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#classes">ক্লাসসমূহ</a>
+  <a href="about.html">সম্পর্কে</a>
+  <a href="contact.html">যোগাযোগ</a>
+  <a class="mobile-cta" href="#classes">শুরু করো</a>
+</div>
+<script>
+  (function(){
+    var t = document.getElementById('menuToggle');
+    var m = document.getElementById('mobileNav');
+    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+  })();
+</script>
 
 <div class="hero">
     <div class="eyebrow tech">CLASS_05 → CLASS_12</div>
@@ -45,8 +59,6 @@
     </div>
     <div class="chip-row" id="chipRow"></div>
 </div>
-
-<div class="stats-wrap" id="statsWrap"></div>
 
 <section class="section-wrap" id="classes">
   <div class="section-head">
@@ -179,15 +191,8 @@
     const readyClasses = CLASSES.filter(c => c.ready);
     subjCount.textContent = `${readyClasses.length} CLASSES · MORE INCOMING`;
 
-    // স্ট্যাটস
-    const totalVideos = ALL_CHAPTERS.length;
     const subjectSet = new Set();
     readyClasses.forEach(c => c.subjects.forEach(s => subjectSet.add(s)));
-    document.getElementById('statsWrap').innerHTML = `
-      <div class="stat-box"><div class="n tech">${totalVideos}</div><div class="l tech">TOTAL VIDEOS</div></div>
-      <div class="stat-box"><div class="n tech">${readyClasses.length}</div><div class="l tech">CLASSES LIVE</div></div>
-      <div class="stat-box"><div class="n tech">${subjectSet.size}</div><div class="l tech">SUBJECTS</div></div>
-    `;
 
     // ক্যাটাগরি চিপস (সাবজেক্ট অনুযায়ী)
     subjectSet.forEach(key => {
@@ -226,7 +231,7 @@
             <div class="recent-title">${v.title}</div>
           </div>
         `;
-        card.addEventListener('click', () => { window.location.href = `video.html?class=${v.classId}&subject=${v.subjectKey}`; });
+        card.addEventListener('click', () => { window.location.href = `video.html?class=${v.classId}&subject=${v.subjectKey}&chapter=${encodeURIComponent(v.chapter)}&topic=${encodeURIComponent(v.title)}`; });
         rg.appendChild(card);
       });
     }

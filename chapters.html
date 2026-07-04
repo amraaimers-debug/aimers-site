@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>সাবজেক্ট বেছে নাও — Aimers</title>
-<meta name="description" content="তোমার ক্লাসের সব সাবজেক্ট — বাংলা, ইংলিশ, গণিত, বিজ্ঞান, আইসিটি — বেছে নিয়ে চ্যাপ্টার-ভিত্তিক ভিডিও ক্লাস দেখো, সম্পূর্ণ ফ্রি।">
-<link rel="canonical" href="https://aimers-site.vercel.app/subject.html">
-<meta property="og:type" content="website">
-<meta property="og:title" content="সাবজেক্ট বেছে নাও — Aimers">
-<meta property="og:description" content="তোমার ক্লাসের সব সাবজেক্ট বেছে নিয়ে চ্যাপ্টার-ভিত্তিক ভিডিও ক্লাস দেখো।">
-<meta property="og:locale" content="bn_BD">
+<title>অধ্যায় বেছে নাও — Aimers</title>
+<meta name="description" content="এই সাবজেক্টের সব অধ্যায় বেছে নিয়ে টপিক-ভিত্তিক ভিডিও ক্লাস দেখো।">
+<link rel="canonical" href="https://aimers-site.vercel.app/chapters.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -24,44 +20,32 @@
     <a href="contact.html">যোগাযোগ</a>
     <a class="cta-btn" href="index.html#classes">শুরু করো</a>
   </nav>
-  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
 </header>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html#classes">ক্লাসসমূহ</a>
-  <a href="about.html">সম্পর্কে</a>
-  <a href="contact.html">যোগাযোগ</a>
-  <a class="mobile-cta" href="index.html#classes">শুরু করো</a>
-</div>
-<script>
-  (function(){
-    var t = document.getElementById('menuToggle');
-    var m = document.getElementById('mobileNav');
-    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
-  })();
-</script>
 
 <div class="breadcrumb tech">
   <a href="index.html">AIMERS</a>
   <span class="sep">/</span>
-  <span class="current" id="crumbClass">ক্লাস</span>
+  <a href="#" id="crumbClass">ক্লাস</a>
+  <span class="sep">/</span>
+  <span class="current" id="crumbSubject">সাবজেক্ট</span>
 </div>
 
 <div class="page-head">
-  <div class="eyebrow tech" id="classTag">CLASS_00</div>
-  <h1 id="pageTitle">সাবজেক্ট বেছে নাও</h1>
-  <p>এই ক্লাসের যেই সাবজেক্টে ক্লিক করবে, সেটার চ্যাপ্টার-ভিত্তিক ভিডিও লিস্ট খুলে যাবে।</p>
+  <div class="eyebrow tech" id="pageTag">CLASS_00 · সাবজেক্ট</div>
+  <h1 id="pageTitle">অধ্যায় বেছে নাও</h1>
+  <p>যেই অধ্যায়ে ক্লিক করবে, তার ভিতরের টপিকগুলো (ভিডিওসহ) দেখা যাবে।</p>
 </div>
 
 <section class="section-wrap">
   <div class="section-head">
-    <h2>সাবজেক্ট সমূহ</h2>
-    <span class="tech" id="subjCount">LOADING...</span>
+    <h2>অধ্যায় সমূহ</h2>
+    <span class="tech" id="chapCount">LOADING...</span>
   </div>
   <div id="loadState" class="state-screen">
     <div class="tech blink">LOADING DATA</div>
-    <p>Google Sheet থেকে সাবজেক্টের তালিকা লোড হচ্ছে...</p>
+    <p>Google Sheet থেকে অধ্যায়ের তালিকা লোড হচ্ছে...</p>
   </div>
-  <div class="grid" id="subjectGrid"></div>
+  <div class="grid" id="chapterGrid"></div>
 </section>
 
 <footer class="site-footer">
@@ -106,7 +90,8 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const classId = params.get('class');
-  const grid = document.getElementById('subjectGrid');
+  const subjectKey = params.get('subject');
+  const grid = document.getElementById('chapterGrid');
   const loadState = document.getElementById('loadState');
 
   async function main(){
@@ -123,40 +108,54 @@
     }
 
     const cls = getClass(classId);
-    if(!cls || !cls.ready){
+    const subj = subjectKey ? getSubject(subjectKey) : null;
+
+    if(!cls || !subj || !cls.subjects.includes(subjectKey)){
       window.location.href = 'index.html';
       return;
     }
 
     loadState.style.display = 'none';
     document.getElementById('crumbClass').textContent = `ক্লাস ${cls.num}`;
-    document.getElementById('classTag').textContent = `CLASS_${cls.id.padStart(2,'0')}`;
-    document.getElementById('pageTitle').textContent = `ক্লাস ${cls.num} — সাবজেক্ট বেছে নাও`;
-    document.getElementById('subjCount').textContent = `${cls.subjects.length} SUBJECTS`;
-    document.title = `ক্লাস ${cls.num} সাবজেক্ট — Aimers`;
+    document.getElementById('crumbClass').href = `subject.html?class=${cls.id}`;
+    document.getElementById('crumbSubject').textContent = subj.name;
+    document.getElementById('pageTag').textContent = `CLASS_${cls.id.padStart(2,'0')} · ${subj.name}`;
+    document.getElementById('pageTitle').textContent = `${subj.name} — অধ্যায় বেছে নাও`;
+    document.title = `${subj.name} অধ্যায় — ক্লাস ${cls.num} — Aimers`;
 
-    cls.subjects.forEach(key => {
-      const s = getSubject(key);
-      const count = videoCount(cls.id, key);
-      const isEmpty = count === 0;
+    const chapterNames = getChapterNames(cls.id, subjectKey);
+    document.getElementById('chapCount').textContent = `${chapterNames.length} CHAPTERS`;
+
+    if(chapterNames.length === 0){
+      loadState.style.display = '';
+      loadState.className = 'state-screen';
+      loadState.innerHTML = `
+        <div class="tech">এখনো কোনো অধ্যায় যুক্ত হয়নি</div>
+        <p>শীঘ্রই ${subj.name} (ক্লাস ${cls.num}) এর অধ্যায় যুক্ত হবে।</p>
+        <a class="cta-btn retry-btn" href="subject.html?class=${cls.id}">অন্য সাবজেক্ট দেখো</a>
+      `;
+      return;
+    }
+
+    const accents = ['#00f0ff','#ff2e9a','#9d4dff','#ffd23f'];
+    chapterNames.forEach((chapterName, i) => {
+      const topics = getTopics(cls.id, subjectKey, chapterName);
+      const accent = accents[i % accents.length];
 
       const card = document.createElement('div');
-      card.className = 'card' + (isEmpty ? ' coming' : '');
-      card.style.setProperty('--accent', s.accent);
+      card.className = 'card';
+      card.style.setProperty('--accent', accent);
       card.tabIndex = 0;
       card.innerHTML = `
-        ${isEmpty ? '<div class="badge">শীঘ্রই</div>' : ''}
-        <div class="subj-icon">${s.icon}</div>
-        <h3>${s.name}</h3>
-        <div class="count"><span class="n">${count}</span>টি ভিডিও</div>
-        ${isEmpty ? '' : '<div class="go">ভিডিও দেখো →</div>'}
+        <div class="id tech">CH_${String(i+1).padStart(2,'0')}</div>
+        <h3 style="font-size:22px;">${chapterName}</h3>
+        <div class="count"><span class="n">${topics.length}</span>টি টপিক</div>
+        <div class="go">টপিক দেখো →</div>
       `;
-      if(!isEmpty){
-        card.addEventListener('click', () => {
-          window.location.href = `video.html?class=${cls.id}&subject=${key}`;
-        });
-        card.addEventListener('keydown', (e) => { if(e.key === 'Enter') card.click(); });
-      }
+      card.addEventListener('click', () => {
+        window.location.href = `video.html?class=${cls.id}&subject=${subjectKey}&chapter=${encodeURIComponent(chapterName)}`;
+      });
+      card.addEventListener('keydown', (e) => { if(e.key === 'Enter') card.click(); });
       grid.appendChild(card);
     });
   }

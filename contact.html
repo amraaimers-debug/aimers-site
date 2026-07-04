@@ -40,7 +40,21 @@
     <a href="contact.html">যোগাযোগ</a>
     <a class="cta-btn" href="index.html#classes">শুরু করো</a>
   </nav>
+  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
 </header>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#classes">ক্লাসসমূহ</a>
+  <a href="about.html">সম্পর্কে</a>
+  <a href="contact.html">যোগাযোগ</a>
+  <a class="mobile-cta" href="index.html#classes">শুরু করো</a>
+</div>
+<script>
+  (function(){
+    var t = document.getElementById('menuToggle');
+    var m = document.getElementById('mobileNav');
+    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+  })();
+</script>
 
 <div class="breadcrumb tech">
   <a href="index.html">AIMERS</a>

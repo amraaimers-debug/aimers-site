@@ -43,13 +43,32 @@
     font-family:'Rajdhani',sans-serif; font-size:14px; letter-spacing:1px; color:var(--muted);
     padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:6px;
   }
+
+  .chap-group{ border-bottom:1px solid var(--line); }
+  .chap-group:last-child{ border-bottom:none; }
+  .chap-head{
+    display:flex; align-items:center; gap:10px; padding:14px 8px; cursor:pointer;
+    transition:background .2s;
+  }
+  .chap-head:hover{ background:rgba(0,240,255,0.05); }
+  .chap-head .chevron{
+    font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--cyan);
+    transition:transform .25s; flex-shrink:0;
+  }
+  .chap-group.open .chap-head .chevron{ transform:rotate(90deg); }
+  .chap-head .name{ font-size:14px; font-weight:600; color:var(--text); flex:1; }
+  .chap-head .count{ font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--muted); }
+
+  .chap-body{ display:none; padding-bottom:8px; }
+  .chap-group.open .chap-body{ display:block; }
+
   .chap-row{
-    display:flex; align-items:center; gap:12px; padding:12px 8px; cursor:pointer;
+    display:flex; align-items:center; gap:12px; padding:10px 8px 10px 26px; cursor:pointer;
     border-left:2px solid transparent; transition:background .2s, border-color .2s;
   }
   .chap-row:hover{ background:rgba(0,240,255,0.05); }
   .chap-row.active{ background:rgba(0,240,255,0.08); border-left-color:var(--cyan); }
-  .chap-row .num{ font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); width:24px; flex-shrink:0; }
+  .chap-row .num{ font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); width:22px; flex-shrink:0; }
   .chap-row.active .num{ color:var(--cyan); }
   .chap-row .t{ font-size:13.5px; color:var(--text); line-height:1.5; }
   .chap-row .dot-empty{
@@ -71,9 +90,23 @@
     <a href="index.html#classes">ক্লাসসমূহ</a>
     <a href="about.html">সম্পর্কে</a>
     <a href="contact.html">যোগাযোগ</a>
-    <button class="cta-btn">শুরু করো</button>
+    <a class="cta-btn" href="index.html#classes">শুরু করো</a>
   </nav>
+  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
 </header>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#classes">ক্লাসসমূহ</a>
+  <a href="about.html">সম্পর্কে</a>
+  <a href="contact.html">যোগাযোগ</a>
+  <a class="mobile-cta" href="index.html#classes">শুরু করো</a>
+</div>
+<script>
+  (function(){
+    var t = document.getElementById('menuToggle');
+    var m = document.getElementById('mobileNav');
+    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+  })();
+</script>
 
 <div class="breadcrumb tech">
   <a href="index.html">AIMERS</a>
@@ -107,7 +140,7 @@
   </div>
 
   <div class="chapter-panel" id="chapterPanel" style="display:none;">
-    <h4 class="tech">চ্যাপ্টার লিস্ট</h4>
+    <h4 class="tech">অধ্যায় ও টপিক</h4>
     <div id="chapterList"></div>
   </div>
 </div>
@@ -155,6 +188,8 @@
   const params = new URLSearchParams(window.location.search);
   const classId = params.get('class');
   const subjectKey = params.get('subject');
+  const wantChapter = params.get('chapter'); // ঐচ্ছিক — দেওয়া থাকলে সেটাই খোলা অবস্থায় শুরু হবে
+  const wantTopic = params.get('topic');
   const loadState = document.getElementById('loadState');
 
   async function main(){
@@ -178,20 +213,9 @@
       return;
     }
 
-    loadState.style.display = 'none';
-    document.getElementById('watchMain').style.display = '';
-    document.getElementById('chapterPanel').style.display = '';
+    const chapterNames = getChapterNames(cls.id, subjectKey);
 
-    document.getElementById('crumbClass').textContent = `ক্লাস ${cls.num}`;
-    document.getElementById('crumbClass').href = `subject.html?class=${cls.id}`;
-    document.getElementById('crumbSubject').textContent = subj.name;
-    document.title = `${subj.name} — ক্লাস ${cls.num} — Aimers`;
-
-    const chapters = getChapters(cls.id, subjectKey);
-    const listEl = document.getElementById('chapterList');
-    const screenEl = document.getElementById('playerScreen');
-
-    if(chapters.length === 0){
+    if(chapterNames.length === 0){
       document.getElementById('watchMain').style.display = 'none';
       document.getElementById('chapterPanel').style.display = 'none';
       loadState.style.display = '';
@@ -204,34 +228,80 @@
       return;
     }
 
-    function renderChapter(index){
-      const ch = chapters[index];
-      document.getElementById('playerTag').textContent = `CLASS_${cls.id.padStart(2,'0')} · ${subj.name}`;
-      document.getElementById('watchTitle').textContent = ch.title;
-      document.getElementById('watchMeta').textContent = `CHAPTER ${String(index+1).padStart(2,'0')} OF ${String(chapters.length).padStart(2,'0')}`;
+    loadState.style.display = 'none';
+    document.getElementById('watchMain').style.display = '';
+    document.getElementById('chapterPanel').style.display = '';
 
-      screenEl.innerHTML = ch.youtubeId
-        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${ch.youtubeId}" title="${ch.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+    document.getElementById('crumbClass').textContent = `ক্লাস ${cls.num}`;
+    document.getElementById('crumbClass').href = `subject.html?class=${cls.id}`;
+    document.getElementById('crumbSubject').textContent = subj.name;
+    document.title = `${subj.name} — ক্লাস ${cls.num} — Aimers`;
+
+    const listEl = document.getElementById('chapterList');
+    const screenEl = document.getElementById('playerScreen');
+
+    function renderTopic(chapterName, topics, index, rowEl){
+      const tp = topics[index];
+      document.getElementById('playerTag').textContent = `CLASS_${cls.id.padStart(2,'0')} · ${subj.name} · ${chapterName}`;
+      document.getElementById('watchTitle').textContent = tp.title;
+      document.getElementById('watchMeta').textContent = `TOPIC ${String(index+1).padStart(2,'0')} OF ${String(topics.length).padStart(2,'0')} — ${chapterName}`;
+
+      screenEl.innerHTML = tp.youtubeId
+        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${tp.youtubeId}" title="${tp.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
         : `<div class="empty-note"><div class="ring">▶</div><div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div></div>`;
 
-      [...listEl.children].forEach((row, i) => row.classList.toggle('active', i === index));
+      document.querySelectorAll('.chap-row.active').forEach(r => r.classList.remove('active'));
+      rowEl.classList.add('active');
     }
 
-    chapters.forEach((ch, i) => {
-      const row = document.createElement('div');
-      row.className = 'chap-row';
-      row.tabIndex = 0;
-      row.innerHTML = `
-        <span class="num tech">${String(i+1).padStart(2,'0')}</span>
-        <span class="t">${ch.title}</span>
-        <span class="dot-empty"></span>
+    let firstRowToPlay = null;
+
+    chapterNames.forEach((chapterName, ci) => {
+      const topics = getTopics(cls.id, subjectKey, chapterName);
+
+      const group = document.createElement('div');
+      group.className = 'chap-group';
+
+      const head = document.createElement('div');
+      head.className = 'chap-head';
+      head.innerHTML = `
+        <span class="chevron">▶</span>
+        <span class="name">${chapterName}</span>
+        <span class="count tech">${topics.length}</span>
       `;
-      row.addEventListener('click', () => renderChapter(i));
-      row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderChapter(i); });
-      listEl.appendChild(row);
+      head.addEventListener('click', () => group.classList.toggle('open'));
+
+      const body = document.createElement('div');
+      body.className = 'chap-body';
+
+      topics.forEach((tp, ti) => {
+        const row = document.createElement('div');
+        row.className = 'chap-row';
+        row.tabIndex = 0;
+        row.innerHTML = `
+          <span class="num tech">${String(ti+1).padStart(2,'0')}</span>
+          <span class="t">${tp.title}</span>
+          <span class="dot-empty"></span>
+        `;
+        row.addEventListener('click', () => renderTopic(chapterName, topics, ti, row));
+        row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderTopic(chapterName, topics, ti, row); });
+        body.appendChild(row);
+
+        const isWanted = wantChapter === chapterName && (wantTopic ? wantTopic === tp.title : ti === 0);
+        if(isWanted || (!wantChapter && ci === 0 && ti === 0)){
+          firstRowToPlay = { chapterName, topics, index: ti, row, group };
+        }
+      });
+
+      group.appendChild(head);
+      group.appendChild(body);
+      listEl.appendChild(group);
     });
 
-    renderChapter(0);
+    if(firstRowToPlay){
+      firstRowToPlay.group.classList.add('open');
+      renderTopic(firstRowToPlay.chapterName, firstRowToPlay.topics, firstRowToPlay.index, firstRowToPlay.row);
+    }
   }
 
   main();

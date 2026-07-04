@@ -236,6 +236,95 @@ footer{
 @media (prefers-reduced-motion: reduce){
   .card, .pulse-badge, .scanline{ animation:none; transition:none; }
 }
+/* SEARCH + CHIPS (hero) */
+.hero-search{
+  margin-top:30px; display:flex; gap:10px; max-width:440px;
+}
+.hero-search input{
+  flex:1; background:var(--panel); border:1px solid var(--line); color:var(--text);
+  padding:13px 16px; font-family:'Hind Siliguri',sans-serif; font-size:14px; outline:none;
+  transition:border-color .25s;
+}
+.hero-search input:focus{ border-color:var(--cyan); }
+.hero-search input::placeholder{ color:var(--muted); }
+.hero-search button{
+  background:var(--cyan); color:#001014; border:none; padding:0 20px;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px; cursor:pointer;
+  transition:box-shadow .3s;
+}
+.hero-search button:hover{ box-shadow:0 0 18px rgba(0,240,255,0.45); }
+
+.chip-row{ margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  font-family:'Rajdhani',sans-serif; font-size:12.5px; font-weight:600; color:var(--muted);
+  border:1px solid var(--line); padding:6px 14px; cursor:pointer;
+  transition:color .2s, border-color .2s;
+}
+.chip:hover, .chip.active{ color:var(--cyan); border-color:var(--cyan); }
+
+/* STATS */
+.stats-wrap{
+  padding:0 6vw 6vh; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:16px;
+}
+.stat-box{ border:1px solid var(--line); background:var(--panel); padding:22px; text-align:center; }
+.stat-box .n{ font-family:'Rajdhani',sans-serif; font-size:32px; font-weight:700; color:var(--cyan); }
+.stat-box .l{ margin-top:6px; font-size:12.5px; color:var(--muted); letter-spacing:0.5px; }
+
+/* RECENT VIDEOS */
+.recent-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:18px; }
+.recent-card{
+  background:var(--panel); border:1px solid var(--line); cursor:pointer; overflow:hidden;
+  transition:transform .3s, border-color .3s, box-shadow .3s;
+}
+.recent-card:hover{ transform:translateY(-6px); border-color:var(--cyan); box-shadow:0 0 24px -8px var(--cyan); }
+.recent-thumb{
+  height:130px; position:relative; overflow:hidden;
+  background:linear-gradient(150deg,#150c2c,#1c0f38 55%,#0d1b33);
+  display:flex; align-items:center; justify-content:center;
+}
+.recent-thumb img{ width:100%; height:100%; object-fit:cover; }
+.recent-thumb .play{
+  position:absolute; width:40px; height:40px; border-radius:50%; border:1.5px solid var(--cyan);
+  color:var(--cyan); display:flex; align-items:center; justify-content:center; font-size:13px; padding-left:2px;
+  background:rgba(8,6,15,0.5);
+}
+.recent-body{ padding:16px; }
+.recent-tag{ font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--magenta); letter-spacing:0.5px; }
+.recent-title{ margin-top:6px; font-size:14px; font-weight:600; line-height:1.5; }
+.no-results{ color:var(--muted); font-size:13.5px; padding:20px 2px; }
+
+/* FOOTER (multi-column) */
+footer.site-footer{
+  padding:56px 6vw 30px; border-top:1px solid var(--line);
+  display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:32px;
+}
+footer.site-footer .f-brand .logo{ margin-bottom:14px; }
+footer.site-footer .f-brand p{ font-size:13px; color:var(--muted); line-height:1.8; max-width:280px; }
+footer.site-footer .f-social{ display:flex; gap:12px; margin-top:16px; }
+footer.site-footer .f-social a{
+  width:34px; height:34px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+  font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--muted); transition:color .2s, border-color .2s;
+}
+footer.site-footer .f-social a:hover{ color:var(--cyan); border-color:var(--cyan); }
+footer.site-footer h5{
+  font-family:'Rajdhani',sans-serif; font-size:13px; letter-spacing:1px; color:var(--text);
+  margin-bottom:16px;
+}
+footer.site-footer ul{ list-style:none; display:flex; flex-direction:column; gap:10px; }
+footer.site-footer ul a{ font-size:13.5px; color:var(--muted); transition:color .2s; }
+footer.site-footer ul a:hover{ color:var(--cyan); }
+.footer-bottom{
+  padding:22px 6vw 40px; border-top:1px solid var(--line);
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  font-size:12px; color:var(--muted); font-family:'Rajdhani',sans-serif;
+}
+@media (max-width:760px){
+  footer.site-footer{ grid-template-columns:1fr 1fr; padding:40px 5vw 10px; }
+}
+@media (max-width:480px){
+  footer.site-footer{ grid-template-columns:1fr; }
+}
+
 :focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; }
 
 /* DATA LOAD / ERROR STATE */

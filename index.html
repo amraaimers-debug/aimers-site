@@ -32,7 +32,6 @@
 </header>
 
 <div class="hero">
-  <div>
     <div class="eyebrow tech">CLASS_05 → CLASS_12</div>
     <h1>তোমার ক্লাস বেছে নাও,<br><span class="glow">শেখা</span> শুরু করো আজই</h1>
     <p>চ্যাপ্টার অনুযায়ী সাজানো ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, আইসিটি, বিজ্ঞান, সব একজায়গায়।</p>
@@ -40,8 +39,14 @@
       <a class="cta-btn" href="#classes">ক্লাস দেখা শুরু করো</a>
       <a class="ghost-btn tech" href="#classes">সব ক্লাস দেখো →</a>
     </div>
-  </div>
+    <div class="hero-search">
+      <input type="text" id="searchInput" placeholder="ক্লাস বা সাবজেক্ট খুঁজো... (যেমন: ৮ অথবা গণিত)">
+      <button id="searchBtn" class="tech">খুঁজো</button>
+    </div>
+    <div class="chip-row" id="chipRow"></div>
 </div>
+
+<div class="stats-wrap" id="statsWrap"></div>
 
 <section class="section-wrap" id="classes">
   <div class="section-head">
@@ -53,12 +58,52 @@
     <p>Google Sheet থেকে ক্লাসের তালিকা লোড হচ্ছে...</p>
   </div>
   <div class="grid" id="classGrid"></div>
+  <div class="no-results" id="noResults" style="display:none;">কোনো ক্লাস/সাবজেক্ট মিলেনি — অন্য কিছু খুঁজে দেখো।</div>
 </section>
 
-<footer>
+<section class="section-wrap" id="recentSection" style="display:none;">
+  <div class="section-head">
+    <h2>সাম্প্রতিক ভিডিও</h2>
+    <span class="tech">RECENTLY ADDED</span>
+  </div>
+  <div class="recent-grid" id="recentGrid"></div>
+</section>
+
+<footer class="site-footer">
+  <div class="f-brand">
+    <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+    <p>ক্লাস ৫ থেকে ১২ এর জন্য চ্যাপ্টার-ভিত্তিক ফ্রি ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, বিজ্ঞান, আইসিটি।</p>
+    <div class="f-social">
+      <a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener" title="YouTube">▶</a>
+      <a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener" title="Facebook">f</a>
+      <a href="mailto:amraaimers@gmail.com" title="Email">✉</a>
+    </div>
+  </div>
+  <div>
+    <h5 class="tech">ক্লাসসমূহ</h5>
+    <ul id="footerClassLinks"></ul>
+  </div>
+  <div>
+    <h5 class="tech">পেইজ</h5>
+    <ul>
+      <li><a href="index.html">হোম</a></li>
+      <li><a href="about.html">সম্পর্কে</a></li>
+      <li><a href="contact.html">যোগাযোগ</a></li>
+    </ul>
+  </div>
+  <div>
+    <h5 class="tech">যোগাযোগ</h5>
+    <ul>
+      <li><a href="mailto:amraaimers@gmail.com">amraaimers@gmail.com</a></li>
+      <li><a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">@AIMERS-24h</a></li>
+      <li><a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener">facebook.com/aimer24h</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
   <div>© ২০২৬ Aimers</div>
   <div class="tech">MADE IN BANGLADESH</div>
-</footer>
+</div>
 
 <script src="data.js"></script>
 <script>
@@ -66,29 +111,27 @@
   const grid = document.getElementById('classGrid');
   const loadState = document.getElementById('loadState');
   const subjCount = document.getElementById('subjCount');
+  const noResults = document.getElementById('noResults');
+  const chipRow = document.getElementById('chipRow');
+  const searchInput = document.getElementById('searchInput');
+  const footerClassLinks = document.getElementById('footerClassLinks');
 
-  async function main(){
-    try{
-      await loadData();
-    } catch(err){
-      loadState.className = 'state-screen error';
-      loadState.innerHTML = `
-        <div class="tech">লোড করা যায়নি</div>
-        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
-        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
-      `;
-      return;
-    }
+  let activeFilter = '';
 
-    loadState.style.display = 'none';
-    const readyCount = CLASSES.filter(c => c.ready).length;
-    subjCount.textContent = `${readyCount} CLASSES · MORE INCOMING`;
+  function renderClasses(){
+    grid.innerHTML = '';
+    const q = activeFilter.trim().toLowerCase();
+    let shown = 0;
 
     CLASSES.forEach((c, i) => {
+      const subjectNames = c.subjects.map(k => getSubject(k).name);
+      const matches = !q || c.num.includes(q) || c.id.includes(q) ||
+        subjectNames.some(n => n.toLowerCase().includes(q));
+      if(!matches) return;
+      shown++;
+
       const accent = accents[i % accents.length];
-      const subjectLabel = c.ready
-        ? c.subjects.map(k => getSubject(k).name).join(' · ')
-        : 'শীঘ্রই যুক্ত হবে';
+      const subjectLabel = c.ready ? subjectNames.join(' · ') : 'শীঘ্রই যুক্ত হবে';
 
       const card = document.createElement('div');
       card.className = 'card' + (c.ready ? '' : ' coming');
@@ -107,7 +150,94 @@
       }
       grid.appendChild(card);
     });
+
+    noResults.style.display = shown === 0 ? '' : 'none';
+    grid.style.display = shown === 0 ? 'none' : '';
   }
+
+  function setFilter(val){
+    activeFilter = val;
+    searchInput.value = val;
+    [...chipRow.children].forEach(c => c.classList.toggle('active', c.dataset.val === val));
+    renderClasses();
+  }
+
+  async function main(){
+    try{
+      await loadData();
+    } catch(err){
+      loadState.className = 'state-screen error';
+      loadState.innerHTML = `
+        <div class="tech">লোড করা যায়নি</div>
+        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
+        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
+      `;
+      return;
+    }
+
+    loadState.style.display = 'none';
+    const readyClasses = CLASSES.filter(c => c.ready);
+    subjCount.textContent = `${readyClasses.length} CLASSES · MORE INCOMING`;
+
+    // স্ট্যাটস
+    const totalVideos = ALL_CHAPTERS.length;
+    const subjectSet = new Set();
+    readyClasses.forEach(c => c.subjects.forEach(s => subjectSet.add(s)));
+    document.getElementById('statsWrap').innerHTML = `
+      <div class="stat-box"><div class="n tech">${totalVideos}</div><div class="l tech">TOTAL VIDEOS</div></div>
+      <div class="stat-box"><div class="n tech">${readyClasses.length}</div><div class="l tech">CLASSES LIVE</div></div>
+      <div class="stat-box"><div class="n tech">${subjectSet.size}</div><div class="l tech">SUBJECTS</div></div>
+    `;
+
+    // ক্যাটাগরি চিপস (সাবজেক্ট অনুযায়ী)
+    subjectSet.forEach(key => {
+      const chip = document.createElement('div');
+      chip.className = 'chip tech';
+      chip.textContent = getSubject(key).name;
+      chip.dataset.val = getSubject(key).name.toLowerCase();
+      chip.addEventListener('click', () => setFilter(chip.dataset.val === activeFilter ? '' : chip.dataset.val));
+      chipRow.appendChild(chip);
+    });
+
+    // ফুটার ক্লাস লিংক
+    readyClasses.forEach(c => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="subject.html?class=${c.id}">ক্লাস ${c.num}</a>`;
+      footerClassLinks.appendChild(li);
+    });
+
+    // সাম্প্রতিক ভিডিও
+    const recent = getRecentVideos(4);
+    if(recent.length){
+      document.getElementById('recentSection').style.display = '';
+      const rg = document.getElementById('recentGrid');
+      recent.forEach(v => {
+        const cls = getClass(v.classId);
+        const subj = getSubject(v.subjectKey);
+        const card = document.createElement('div');
+        card.className = 'recent-card';
+        card.innerHTML = `
+          <div class="recent-thumb">
+            <img src="https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+            <div class="play">▶</div>
+          </div>
+          <div class="recent-body">
+            <div class="recent-tag tech">CLASS_${v.classId.padStart(2,'0')} · ${subj.name}</div>
+            <div class="recent-title">${v.title}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => { window.location.href = `video.html?class=${v.classId}&subject=${v.subjectKey}`; });
+        rg.appendChild(card);
+      });
+    }
+
+    renderClasses();
+  }
+
+  searchInput.addEventListener('input', () => setFilter(searchInput.value));
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    document.getElementById('classes').scrollIntoView({behavior:'smooth'});
+  });
 
   main();
 </script>

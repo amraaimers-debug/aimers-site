@@ -31,6 +31,7 @@ function getSubject(key){
 
 let CLASSES = [];
 let CHAPTERS = {};
+let ALL_CHAPTERS = []; // Sheet-এ যে ক্রমে সারি আছে, সেই ক্রমে — শেষেরগুলোই সাম্প্রতিক যোগ করা ধরা হয়
 let DATA_LOADED = false;
 
 // ছোট CSV পার্সার — কমা/কোটেশন/লাইনব্রেক সামলাতে পারে
@@ -95,14 +96,24 @@ async function loadData(){
   }));
 
   CHAPTERS = {};
+  ALL_CHAPTERS = [];
   parseCSV(chaptersCsv).forEach(r => {
     if(!r.classId || !r.subject) return;
     const key = `${r.classId}_${r.subject}`;
     if(!CHAPTERS[key]) CHAPTERS[key] = [];
-    CHAPTERS[key].push({ title: r.title || 'শিরোনাম নেই', youtubeId: extractYoutubeId(r.youtube) });
+    const entry = { title: r.title || 'শিরোনাম নেই', youtubeId: extractYoutubeId(r.youtube) };
+    CHAPTERS[key].push(entry);
+    if(entry.youtubeId){
+      ALL_CHAPTERS.push({ classId: r.classId, subjectKey: r.subject, title: entry.title, youtubeId: entry.youtubeId });
+    }
   });
 
   DATA_LOADED = true;
+}
+
+// শেষ N টা real ভিডিও (youtubeId বসানো আছে এমন) — সবচেয়ে সাম্প্রতিক আগে
+function getRecentVideos(n = 4){
+  return ALL_CHAPTERS.slice(-n).reverse();
 }
 
 function getClass(id){
@@ -110,23 +121,14 @@ function getClass(id){
 }
 
 // classId + subjectKey দিয়ে চ্যাপ্টার লিস্ট বের করে।
-// Sheet-এ এন্ট্রি না থাকলে অস্থায়ী প্লেসহোল্ডার লিস্ট বানিয়ে দেয়, যাতে পেইজ খালি না লাগে।
+// Sheet-এ এন্ট্রি না থাকলে খালি লিস্ট রিটার্ন করে — কোনো fake টাইটেল বানায় না।
 function getChapters(classId, subjectKey){
   const key = `${classId}_${subjectKey}`;
-  if(CHAPTERS[key] && CHAPTERS[key].length) return CHAPTERS[key];
-
-  const seed = (classId + subjectKey).split('').reduce((a,c) => a + c.charCodeAt(0), 0);
-  const count = 6 + (seed % 14);
-  const list = [];
-  for(let i = 1; i <= count; i++){
-    list.push({ title: `অধ্যায় ${String(i).padStart(2,'0')}`, youtubeId: '' });
-  }
-  return list;
+  return CHAPTERS[key] || [];
 }
 
-function placeholderVideoCount(classId, subjectKey){
+// আসল ভিডিও কাউন্ট — Sheet-এ যা আছে ঠিক তাই, কোনো এলোমেলো সংখ্যা বানানো হয় না
+function videoCount(classId, subjectKey){
   const key = `${classId}_${subjectKey}`;
-  if(CHAPTERS[key] && CHAPTERS[key].length) return CHAPTERS[key].length;
-  const seed = (classId + subjectKey).split('').reduce((a,c) => a + c.charCodeAt(0), 0);
-  return 6 + (seed % 14);
+  return (CHAPTERS[key] || []).length;
 }

@@ -117,6 +117,25 @@ async function loadData(){
   DATA_LOADED = true;
 }
 
+// ============================================================
+// মানসিক স্বাস্থ্য (মনোলগ ভিডিও) — ক্লাস/সাবজেক্ট কাঠামোর বাইরে, আলাদা সিরিজ
+// Sheet-এ আলাদা ট্যাব লাগবে ঠিক এই নামে: "MentalHealth"
+// কলাম: episode, title, youtube
+// ============================================================
+async function loadMentalHealth(){
+  const csv = await fetch(sheetUrl('MentalHealth')).then(r => {
+    if(!r.ok) throw new Error('MentalHealth ট্যাব পড়া যায়নি');
+    return r.text();
+  });
+  return parseCSV(csv)
+    .map(r => ({
+      episode: r.episode || '',
+      title: r.title || 'শিরোনাম নেই',
+      youtubeId: extractYoutubeId(r.youtube),
+    }))
+    .filter(e => e.title && e.title !== 'শিরোনাম নেই');
+}
+
 // এই সাবজেক্টের সব অধ্যায়ের নাম, Sheet-এ যে ক্রমে প্রথম দেখা গেছে সেই ক্রমে (ডুপ্লিকেট বাদে)
 function getChapterNames(classId, subjectKey){
   const key = `${classId}_${subjectKey}`;
@@ -145,4 +164,43 @@ function getClass(id){
 function videoCount(classId, subjectKey){
   const key = `${classId}_${subjectKey}`;
   return (CHAPTERS[key] || []).length;
+}
+
+// ============================================================
+// প্রগ্রেস ট্র্যাকিং — ব্রাউজারের localStorage-এ সেভ থাকে
+// (ডিভাইস/ব্রাউজার বদলালে রিসেট হয়ে যাবে, কোনো সার্ভারে যায় না)
+// ============================================================
+const PROGRESS_KEY = 'aimers_watched_topics';
+
+function topicKey(classId, subjectKey, chapterName, topicTitle){
+  return `${classId}|${subjectKey}|${chapterName}|${topicTitle}`;
+}
+
+function getWatchedSet(){
+  try{
+    return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]'));
+  }catch(e){
+    return new Set();
+  }
+}
+
+function isWatched(classId, subjectKey, chapterName, topicTitle){
+  return getWatchedSet().has(topicKey(classId, subjectKey, chapterName, topicTitle));
+}
+
+function markWatched(classId, subjectKey, chapterName, topicTitle){
+  try{
+    const set = getWatchedSet();
+    set.add(topicKey(classId, subjectKey, chapterName, topicTitle));
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify([...set]));
+  }catch(e){ /* localStorage না থাকলে চুপচাপ স্কিপ করা হবে */ }
+}
+
+// একটা সাবজেক্টের মোট কতগুলো (real) টপিকের মধ্যে কতগুলো দেখা হয়েছে
+function getSubjectProgress(classId, subjectKey){
+  const key = `${classId}_${subjectKey}`;
+  const items = (CHAPTERS[key] || []).filter(it => it.youtubeId);
+  const watched = getWatchedSet();
+  const watchedCount = items.filter(it => watched.has(topicKey(classId, subjectKey, it.chapter, it.title))).length;
+  return { watched: watchedCount, total: items.length };
 }

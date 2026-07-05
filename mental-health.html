@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>মানসিক স্বাস্থ্য — Aimers</title>
+<meta name="description" content="মানসিক স্বাস্থ্য নিয়ে মনোলগ ভিডিও সিরিজ — শিক্ষার্থীদের জন্য সহজ ভাষায়, বন্ধুর মতো করে বলা।">
+<link rel="canonical" href="https://aimers-site.vercel.app/mental-health.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="মানসিক স্বাস্থ্য — Aimers">
+<meta property="og:description" content="মানসিক স্বাস্থ্য নিয়ে মনোলগ ভিডিও সিরিজ, শিক্ষার্থীদের জন্য।">
+<meta property="og:locale" content="bn_BD">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:image" content="https://aimers-site.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aimers-site.vercel.app/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .watch-wrap{
+    display:grid; grid-template-columns:1fr 340px; gap:22px;
+    padding:4vh 6vw 12vh; align-items:start;
+  }
+  .watch-main .player-mock{ padding:0; overflow:hidden; }
+  .watch-main .player-screen{ height:min(52vh, 460px); }
+  .watch-main .player-mock .player-top{ padding:14px 16px 0; }
+  .watch-main .player-mock .player-bar{ padding:0 16px 14px; }
+  .watch-title{ margin-top:20px; font-size:22px; font-weight:700; }
+  .watch-meta{ margin-top:8px; font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--muted); letter-spacing:0.5px; }
+
+  .empty-note{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:var(--muted); text-align:center; padding:0 20px;
+  }
+  .empty-note .ring{
+    width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--purple);
+    display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--purple);
+  }
+  .empty-note .tech{ font-size:12px; }
+
+  .ep-panel{
+    background:var(--panel); border:1px solid var(--line); padding:16px;
+    max-height:640px; overflow-y:auto;
+  }
+  .ep-panel h4{
+    font-family:'Rajdhani',sans-serif; font-size:14px; letter-spacing:1px; color:var(--muted);
+    padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:6px;
+  }
+  .ep-row{
+    display:flex; align-items:center; gap:12px; padding:12px 8px; cursor:pointer;
+    border-left:2px solid transparent; transition:background .2s, border-color .2s;
+  }
+  .ep-row:hover{ background:rgba(157,77,255,0.07); }
+  .ep-row.active{ background:rgba(157,77,255,0.1); border-left-color:var(--purple); }
+  .ep-row .num{ font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); width:26px; flex-shrink:0; }
+  .ep-row.active .num{ color:var(--purple); }
+  .ep-row .t{ font-size:13.5px; color:var(--text); line-height:1.5; }
+
+  .care-note{
+    margin:0 6vw 8vh; padding:20px 24px; border:1px solid var(--line); background:var(--panel);
+    font-size:13px; color:var(--muted); line-height:1.8; max-width:900px;
+  }
+  .care-note strong{ color:var(--text); }
+
+  @media (max-width:900px){
+    .watch-wrap{ grid-template-columns:1fr; padding:3vh 5vw 6vh; }
+    .ep-panel{ max-height:340px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+  <nav>
+    <a href="index.html#classes">ক্লাসসমূহ</a>
+    <a href="mental-health.html">মানসিক স্বাস্থ্য</a>
+    <a href="about.html">সম্পর্কে</a>
+    <a href="contact.html">যোগাযোগ</a>
+    <a class="cta-btn" href="index.html#classes">শুরু করো</a>
+  </nav>
+  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+</header>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#classes">ক্লাসসমূহ</a>
+  <a href="mental-health.html">মানসিক স্বাস্থ্য</a>
+  <a href="about.html">সম্পর্কে</a>
+  <a href="contact.html">যোগাযোগ</a>
+  <a class="mobile-cta" href="index.html#classes">শুরু করো</a>
+</div>
+<script>
+  (function(){
+    var t = document.getElementById('menuToggle');
+    var m = document.getElementById('mobileNav');
+    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+  })();
+</script>
+
+<div class="breadcrumb tech">
+  <a href="index.html">AIMERS</a>
+  <span class="sep">/</span>
+  <span class="current">মানসিক স্বাস্থ্য</span>
+</div>
+
+<div class="page-head">
+  <div class="eyebrow tech" style="color:var(--purple);">TAKE A MOMENT</div>
+  <h1>মানসিক স্বাস্থ্য নিয়ে কথা</h1>
+  <p>পড়াশোনার বাইরেও কিছু কথা — মনোলগ স্টাইলে, বন্ধুর মতো করে বলা। একা লাগলে, চাপ লাগলে, কিংবা শুধু কেউ বুঝুক এমনটা চাইলে — এই এপিসোডগুলো তোমার জন্য।</p>
+</div>
+
+<div class="watch-wrap" id="watchWrap">
+  <div id="loadState" class="state-screen" style="grid-column:1/-1;">
+    <div class="tech blink">LOADING DATA</div>
+    <p>এপিসোড লোড হচ্ছে...</p>
+  </div>
+  <div class="watch-main" id="watchMain" style="display:none;">
+    <div class="player-mock">
+      <div class="player-top">
+        <span class="pulse-badge" style="background:var(--purple); box-shadow:0 0 10px var(--purple);"></span>
+        <span class="tech player-tag">NOW PLAYING</span>
+        <span class="tech player-ch">মানসিক স্বাস্থ্য</span>
+      </div>
+      <div class="player-screen" id="playerScreen">
+        <div class="empty-note">
+          <div class="ring">▶</div>
+          <div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div>
+        </div>
+      </div>
+    </div>
+    <div class="watch-title" id="watchTitle">এপিসোডের শিরোনাম</div>
+    <div class="watch-meta tech" id="watchMeta">EPISODE 01</div>
+  </div>
+
+  <div class="ep-panel" id="epPanel" style="display:none;">
+    <h4 class="tech">এপিসোড লিস্ট</h4>
+    <div id="epList"></div>
+  </div>
+</div>
+
+<div class="care-note">
+  <strong>একটা কথা —</strong> এই ভিডিওগুলো শুধু কথা বলার জন্য, কোনো চিকিৎসা পরামর্শ না। যদি মনে হয় তুমি সত্যিই কষ্টে আছো বা একা লাগছে, দয়া করে পরিবারের কাউকে, শিক্ষককে, বা কাছের কোনো বিশ্বস্ত মানুষকে জানাও। কথা বলাটা সাহসের কাজ, দুর্বলতার না।
+</div>
+
+<footer class="site-footer">
+  <div class="f-brand">
+    <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+    <p>ক্লাস ৫ থেকে ১২ এর জন্য চ্যাপ্টার-ভিত্তিক ফ্রি ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, বিজ্ঞান, আইসিটি।</p>
+    <div class="f-social">
+      <a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener" title="YouTube">▶</a>
+      <a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener" title="Facebook">f</a>
+      <a href="mailto:amraaimers@gmail.com" title="Email">✉</a>
+    </div>
+  </div>
+  <div>
+    <h5 class="tech">ক্লাসসমূহ</h5>
+    <ul>
+      <li><a href="index.html#classes">সব ক্লাস দেখো →</a></li>
+    </ul>
+  </div>
+  <div>
+    <h5 class="tech">পেইজ</h5>
+    <ul>
+      <li><a href="index.html">হোম</a></li>
+      <li><a href="mental-health.html">মানসিক স্বাস্থ্য</a></li>
+      <li><a href="about.html">সম্পর্কে</a></li>
+      <li><a href="contact.html">যোগাযোগ</a></li>
+    </ul>
+  </div>
+  <div>
+    <h5 class="tech">যোগাযোগ</h5>
+    <ul>
+      <li><a href="mailto:amraaimers@gmail.com">amraaimers@gmail.com</a></li>
+      <li><a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">@AIMERS-24h</a></li>
+      <li><a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener">facebook.com/aimer24h</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <div>© ২০২৬ Aimers</div>
+  <div class="tech">MADE IN BANGLADESH</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const loadState = document.getElementById('loadState');
+
+  async function main(){
+    let episodes = [];
+    try{
+      episodes = await loadMentalHealth();
+    } catch(err){
+      loadState.className = 'state-screen error';
+      loadState.innerHTML = `
+        <div class="tech">লোড করা যায়নি</div>
+        <p>Google Sheet-এ "MentalHealth" নামে একটা ট্যাব থাকা দরকার (কলাম: episode, title, youtube), আর Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা চেক করো।</p>
+        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
+      `;
+      return;
+    }
+
+    if(episodes.length === 0){
+      loadState.className = 'state-screen';
+      loadState.innerHTML = `
+        <div class="tech">শীঘ্রই আসছে</div>
+        <p>এখনো কোনো এপিসোড যুক্ত হয়নি। শীঘ্রই যুক্ত হবে।</p>
+      `;
+      return;
+    }
+
+    loadState.style.display = 'none';
+    document.getElementById('watchMain').style.display = '';
+    document.getElementById('epPanel').style.display = '';
+
+    const listEl = document.getElementById('epList');
+    const screenEl = document.getElementById('playerScreen');
+
+    function renderEp(index){
+      const ep = episodes[index];
+      document.getElementById('watchTitle').textContent = ep.title;
+      document.getElementById('watchMeta').textContent = `EPISODE ${String(index+1).padStart(2,'0')} OF ${String(episodes.length).padStart(2,'0')}`;
+
+      screenEl.innerHTML = ep.youtubeId
+        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${ep.youtubeId}" title="${ep.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+        : `<div class="empty-note"><div class="ring">▶</div><div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div></div>`;
+
+      [...listEl.children].forEach((row, i) => row.classList.toggle('active', i === index));
+    }
+
+    episodes.forEach((ep, i) => {
+      const row = document.createElement('div');
+      row.className = 'ep-row';
+      row.tabIndex = 0;
+      row.innerHTML = `
+        <span class="num tech">${ep.episode || String(i+1).padStart(2,'0')}</span>
+        <span class="t">${ep.title}</span>
+      `;
+      row.addEventListener('click', () => renderEp(i));
+      row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderEp(i); });
+      listEl.appendChild(row);
+    });
+
+    renderEp(0);
+  }
+
+  main();
+</script>
+
+</body>
+</html>

@@ -10,6 +10,14 @@
 <meta property="og:title" content="সাবজেক্ট বেছে নাও — Aimers">
 <meta property="og:description" content="তোমার ক্লাসের সব সাবজেক্ট বেছে নিয়ে চ্যাপ্টার-ভিত্তিক ভিডিও ক্লাস দেখো।">
 <meta property="og:locale" content="bn_BD">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:image" content="https://aimers-site.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aimers-site.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -20,6 +28,7 @@
   <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
   <nav>
     <a href="index.html#classes">ক্লাসসমূহ</a>
+    <a href="mental-health.html">মানসিক স্বাস্থ্য</a>
     <a href="about.html">সম্পর্কে</a>
     <a href="contact.html">যোগাযোগ</a>
     <a class="cta-btn" href="index.html#classes">শুরু করো</a>
@@ -28,7 +37,8 @@
 </header>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html#classes">ক্লাসসমূহ</a>
-  <a href="about.html">সম্পর্কে</a>
+  <a href="mental-health.html">মানসিক স্বাস্থ্য</a>
+    <a href="about.html">সম্পর্কে</a>
   <a href="contact.html">যোগাযোগ</a>
   <a class="mobile-cta" href="index.html#classes">শুরু করো</a>
 </div>
@@ -84,6 +94,7 @@
     <h5 class="tech">পেইজ</h5>
     <ul>
       <li><a href="index.html">হোম</a></li>
+      <li><a href="mental-health.html">মানসিক স্বাস্থ্য</a></li>
       <li><a href="about.html">সম্পর্কে</a></li>
       <li><a href="contact.html">যোগাযোগ</a></li>
     </ul>
@@ -139,6 +150,7 @@
       const s = getSubject(key);
       const count = videoCount(cls.id, key);
       const isEmpty = count === 0;
+      const progress = isEmpty ? null : getSubjectProgress(cls.id, key);
 
       const card = document.createElement('div');
       card.className = 'card' + (isEmpty ? ' coming' : '');
@@ -148,7 +160,7 @@
         ${isEmpty ? '<div class="badge">শীঘ্রই</div>' : ''}
         <div class="subj-icon">${s.icon}</div>
         <h3>${s.name}</h3>
-        <div class="count"><span class="n">${count}</span>টি ভিডিও</div>
+        <div class="count"><span class="n">${count}</span>টি ভিডিও${progress && progress.watched > 0 ? ` · <span class="n">${progress.watched}</span>টি দেখা হয়েছে` : ''}</div>
         ${isEmpty ? '' : '<div class="go">ভিডিও দেখো →</div>'}
       `;
       if(!isEmpty){

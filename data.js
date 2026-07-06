@@ -25,6 +25,7 @@ const SUBJECTS = {
   science:     { name: 'বিজ্ঞান',      icon: '⚛', accent: '#ffd23f' },
   ict:         { name: 'আইসিটি',       icon: '{ }', accent: '#00f0ff' },
   higher_math: { name: 'উচ্চতর গণিত',  icon: '∞', accent: '#ff2e9a' },
+  bwp:         { name: 'বাংলাদেশ ও বিশ্ব পরিচয়', icon: 'ব', accent: '#39ff88' },
 };
 // Sheet-এ নতুন subject key ব্যবহার করলে (উপরে তালিকায় নেই এমন) এই ডিফল্ট ব্যবহার হবে
 function getSubject(key){

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>পেইজ পাওয়া যায়নি — Aimers</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .nf-wrap{
+    min-height:78vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:8vh 6vw;
+  }
+  .nf-code{
+    font-family:'Rajdhani',sans-serif; font-weight:700; font-size:clamp(90px,18vw,160px);
+    line-height:1; color:var(--bg); -webkit-text-stroke:2px var(--cyan);
+    text-shadow:0 0 30px rgba(0,240,255,0.35);
+  }
+  .nf-code span{ -webkit-text-stroke:2px var(--magenta); text-shadow:0 0 30px rgba(255,46,154,0.35); }
+  .nf-title{ margin-top:10px; font-size:22px; font-weight:700; }
+  .nf-sub{ margin-top:12px; color:var(--muted); font-size:14.5px; max-width:420px; line-height:1.8; }
+  .nf-tech{ margin-top:20px; font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); letter-spacing:2px; }
+  .nf-ctas{ margin-top:34px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+  <nav>
+    <a href="index.html#classes">ক্লাসসমূহ</a>
+    <a href="mental-health.html">মানসিক স্বাস্থ্য</a>
+    <a href="about.html">সম্পর্কে</a>
+    <a href="contact.html">যোগাযোগ</a>
+    <a class="cta-btn" href="index.html#classes">শুরু করো</a>
+  </nav>
+  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+</header>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#classes">ক্লাসসমূহ</a>
+  <a href="mental-health.html">মানসিক স্বাস্থ্য</a>
+  <a href="about.html">সম্পর্কে</a>
+  <a href="contact.html">যোগাযোগ</a>
+  <a class="mobile-cta" href="index.html#classes">শুরু করো</a>
+</div>
+<script>
+  (function(){
+    var t = document.getElementById('menuToggle');
+    var m = document.getElementById('mobileNav');
+    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+  })();
+</script>
+
+<div class="nf-wrap">
+  <div class="nf-code tech">4<span>0</span>4</div>
+  <div class="nf-title">এই পেইজটা খুঁজে পাওয়া যায়নি</div>
+  <p class="nf-sub">লিংকটা হয়তো ভুল, অথবা পেইজটা সরিয়ে ফেলা হয়েছে। চিন্তা নেই, হোমপেজ থেকে আবার শুরু করা যাক।</p>
+  <div class="nf-tech">ERROR_CODE: PAGE_NOT_FOUND</div>
+  <div class="nf-ctas">
+    <a class="cta-btn" href="index.html">হোমপেজে ফিরে যাও</a>
+    <a class="ghost-btn tech" href="index.html#classes">ক্লাস ব্রাউজ করো →</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-brand">
+    <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>
+    <p>ক্লাস ৫ থেকে ১২ এর জন্য চ্যাপ্টার-ভিত্তিক ফ্রি ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, বিজ্ঞান, আইসিটি।</p>
+    <div class="f-social">
+      <a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener" title="YouTube">▶</a>
+      <a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener" title="Facebook">f</a>
+      <a href="mailto:amraaimers@gmail.com" title="Email">✉</a>
+    </div>
+  </div>
+  <div>
+    <h5 class="tech">ক্লাসসমূহ</h5>
+    <ul>
+      <li><a href="index.html#classes">সব ক্লাস দেখো →</a></li>
+    </ul>
+  </div>
+  <div>
+    <h5 class="tech">পেইজ</h5>
+    <ul>
+      <li><a href="index.html">হোম</a></li>
+      <li><a href="mental-health.html">মানসিক স্বাস্থ্য</a></li>
+      <li><a href="about.html">সম্পর্কে</a></li>
+      <li><a href="contact.html">যোগাযোগ</a></li>
+    </ul>
+  </div>
+  <div>
+    <h5 class="tech">যোগাযোগ</h5>
+    <ul>
+      <li><a href="mailto:amraaimers@gmail.com">amraaimers@gmail.com</a></li>
+      <li><a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">@AIMERS-24h</a></li>
+      <li><a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener">facebook.com/aimer24h</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <div>© ২০২৬ Aimers</div>
+  <div class="tech">MADE IN BANGLADESH</div>
+</div>
+
+</body>
+</html>

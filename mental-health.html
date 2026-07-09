@@ -70,7 +70,9 @@
   @media (max-width:900px){
     .watch-wrap{ grid-template-columns:1fr; padding:3vh 5vw 6vh; }
     .ep-panel{ max-height:340px; }
+    .skeleton-video-wrap{ grid-template-columns:1fr; }
   }
+  .skeleton-video-wrap{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
 </style>
 </head>
 <body>
@@ -114,9 +116,17 @@
 </div>
 
 <div class="watch-wrap" id="watchWrap">
-  <div id="loadState" class="state-screen" style="grid-column:1/-1;">
-    <div class="tech blink">LOADING DATA</div>
-    <p>এপিসোড লোড হচ্ছে...</p>
+  <div id="loadState" class="skeleton-video-wrap" style="grid-column:1/-1;">
+    <div>
+      <div class="skeleton skeleton-player"></div>
+      <div class="skeleton-line w60" style="margin-top:20px; height:16px;"></div>
+      <div class="skeleton-line w40" style="margin-top:10px;"></div>
+    </div>
+    <div class="skeleton-rows" style="margin-top:0;">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
   </div>
   <div class="watch-main" id="watchMain" style="display:none;">
     <div class="player-mock">
@@ -225,7 +235,7 @@
       document.getElementById('watchMeta').textContent = `EPISODE ${String(index+1).padStart(2,'0')} OF ${String(episodes.length).padStart(2,'0')}`;
 
       screenEl.innerHTML = ep.youtubeId
-        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${ep.youtubeId}" title="${ep.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${encodeURIComponent(ep.youtubeId)}" title="${escapeHtml(ep.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
         : `<div class="empty-note"><div class="ring">▶</div><div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div></div>`;
 
       [...listEl.children].forEach((row, i) => row.classList.toggle('active', i === index));
@@ -236,8 +246,8 @@
       row.className = 'ep-row';
       row.tabIndex = 0;
       row.innerHTML = `
-        <span class="num tech">${ep.episode || String(i+1).padStart(2,'0')}</span>
-        <span class="t">${ep.title}</span>
+        <span class="num tech">${escapeHtml(ep.episode || String(i+1).padStart(2,'0'))}</span>
+        <span class="t">${escapeHtml(ep.title)}</span>
       `;
       row.addEventListener('click', () => renderEp(i));
       row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderEp(i); });

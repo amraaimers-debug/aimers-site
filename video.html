@@ -120,17 +120,26 @@
   .status-mark{
     margin-left:auto; width:16px; text-align:center; flex-shrink:0;
     font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--cyan); font-weight:700;
+    display:inline-block;
   }
   .status-mark:empty::before{
     content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--line);
   }
+  @keyframes mark-pop{
+    0%{ transform:scale(0); opacity:0; }
+    55%{ transform:scale(1.4); opacity:1; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+  .status-mark.pop{ animation:mark-pop .45s cubic-bezier(.34,1.56,.64,1); text-shadow:0 0 10px var(--cyan); }
   .chap-head .head-count{ font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--muted); }
   .chap-head .head-count .w{ color:var(--cyan); }
 
   @media (max-width:900px){
     .watch-wrap{ grid-template-columns:1fr; padding:3vh 5vw 8vh; }
     .chapter-panel{ max-height:340px; }
+    .skeleton-video-wrap{ grid-template-columns:1fr; }
   }
+  .skeleton-video-wrap{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
 </style>
 </head>
 <body>
@@ -170,9 +179,18 @@
 </div>
 
 <div class="watch-wrap" id="watchWrap">
-  <div id="loadState" class="state-screen" style="grid-column:1/-1;">
-    <div class="tech blink">LOADING DATA</div>
-    <p>Google Sheet থেকে ভিডিও তথ্য লোড হচ্ছে...</p>
+  <div id="loadState" class="skeleton-video-wrap" style="grid-column:1/-1;">
+    <div>
+      <div class="skeleton skeleton-player"></div>
+      <div class="skeleton-line w60" style="margin-top:20px; height:16px;"></div>
+      <div class="skeleton-line w40" style="margin-top:10px;"></div>
+    </div>
+    <div class="skeleton-rows" style="margin-top:0;">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
   </div>
   <div class="watch-main" id="watchMain" style="display:none;">
     <div class="player-mock" id="playerMock">
@@ -392,10 +410,18 @@
       row.scrollIntoView({ block: 'nearest' });
 
       if(tp.youtubeId){
+        const wasWatched = isWatched(cls.id, subjectKey, chapterName, tp.title);
         markWatched(cls.id, subjectKey, chapterName, tp.title);
         setLastWatched(cls.id, subjectKey, chapterName, tp.title);
         const mark = row.querySelector('.status-mark');
-        if(mark) mark.textContent = '✓';
+        if(mark){
+          mark.textContent = '✓';
+          if(!wasWatched){
+            mark.classList.remove('pop'); // যদি আগে থেকে থাকে, রিসেট করে আবার ট্রিগার করার জন্য
+            void mark.offsetWidth; // reflow force, যাতে অ্যানিমেশন আবার শুরু হয়
+            mark.classList.add('pop');
+          }
+        }
         updateGroupCount(group, chapterName, topics);
       }
 

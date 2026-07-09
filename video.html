@@ -41,6 +41,32 @@
   .autoplay-toggle input{ accent-color:var(--cyan); width:16px; height:16px; cursor:pointer; }
   #nextTopicBtn:disabled{ opacity:0.35; cursor:default; box-shadow:none; }
 
+  .share-btn{
+    font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; color:var(--text);
+    background:none; border:1px solid var(--line); padding:10px 18px; cursor:pointer;
+    transition:border-color .2s, color .2s; letter-spacing:0.5px;
+  }
+  .share-btn:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .share-btn.copied{ border-color:var(--yellow); color:var(--yellow); }
+
+  /* মোবাইলে স্ক্রল করলে প্লেয়ার ছোট হয়ে উপরে "মিনি" আকারে লেগে থাকে */
+  .mini-close{
+    display:none; position:absolute; top:6px; right:6px; z-index:6; width:24px; height:24px;
+    background:rgba(8,6,15,0.75); color:var(--text); border:1px solid var(--line); border-radius:50%;
+    align-items:center; justify-content:center; cursor:pointer; font-size:12px;
+  }
+  @media (max-width:900px){
+    .player-mock.mini{
+      position:fixed; top:auto; bottom:16px; right:16px; left:auto;
+      width:180px; height:105px; z-index:90;
+      box-shadow:0 10px 34px rgba(0,0,0,0.55); border-color:var(--cyan);
+    }
+    .player-mock.mini .player-top,
+    .player-mock.mini .player-bar{ display:none; }
+    .player-mock.mini .player-screen{ height:100%; }
+    .player-mock.mini .mini-close{ display:flex; }
+  }
+
   #ytPlayer{ width:100%; height:100%; }
   #ytPlayer iframe{ width:100%; height:100%; display:block; }
   .empty-note{ position:absolute; inset:0; }
@@ -149,7 +175,8 @@
     <p>Google Sheet থেকে ভিডিও তথ্য লোড হচ্ছে...</p>
   </div>
   <div class="watch-main" id="watchMain" style="display:none;">
-    <div class="player-mock">
+    <div class="player-mock" id="playerMock">
+      <button class="mini-close" id="miniClose" aria-label="বন্ধ করো">✕</button>
       <div class="player-top">
         <span class="pulse-badge"></span>
         <span class="tech player-tag">NOW PLAYING</span>
@@ -165,6 +192,7 @@
         </div>
       </div>
     </div>
+    <div id="scrollSentinel"></div>
     <div class="watch-title" id="watchTitle">অধ্যায় শিরোনাম</div>
     <div class="watch-meta tech" id="watchMeta">CHAPTER 01 OF 00</div>
     <div class="watch-actions">
@@ -173,6 +201,7 @@
         <input type="checkbox" id="autoplayToggle">
         অটো-প্লে পরবর্তী
       </label>
+      <button class="share-btn tech" id="shareBtn" type="button">শেয়ার করো</button>
     </div>
   </div>
 
@@ -377,6 +406,61 @@
       if(currentFlat < flatTopics.length - 1) renderByFlatIndex(currentFlat + 1);
     };
     nextBtn.addEventListener('click', goToNext);
+
+    // ---- শেয়ার বাটন ----
+    const shareBtn = document.getElementById('shareBtn');
+    shareBtn.addEventListener('click', async () => {
+      const entry = flatTopics[currentFlat];
+      if(!entry) return;
+      const shareUrl = `${location.origin}${location.pathname}?class=${encodeURIComponent(cls.id)}&subject=${encodeURIComponent(subjectKey)}&chapter=${encodeURIComponent(entry.chapterName)}&topic=${encodeURIComponent(entry.tp.title)}`;
+      const shareData = {
+        title: `${entry.tp.title} — Aimers`,
+        text: `${entry.tp.title} — ক্লাস ${cls.num} · ${subj.name}, Aimers-এ দেখো:`,
+        url: shareUrl,
+      };
+      if(navigator.share){
+        try{ await navigator.share(shareData); }catch(e){ /* ইউজার শেয়ার ক্যানসেল করলে কিছু করার নেই */ }
+        return;
+      }
+      try{
+        await navigator.clipboard.writeText(shareUrl);
+        shareBtn.textContent = '✓ লিংক কপি হয়েছে';
+        shareBtn.classList.add('copied');
+        setTimeout(() => { shareBtn.textContent = 'শেয়ার করো'; shareBtn.classList.remove('copied'); }, 2000);
+      }catch(e){
+        window.prompt('লিংক কপি করো:', shareUrl);
+      }
+    });
+
+    // ---- মোবাইলে মিনি (স্টিকি) প্লেয়ার ----
+    const playerMock = document.getElementById('playerMock');
+    const sentinel = document.getElementById('scrollSentinel');
+    const miniClose = document.getElementById('miniClose');
+    let miniDismissed = false;
+
+    if('IntersectionObserver' in window){
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if(en.isIntersecting){
+            miniDismissed = false;
+            playerMock.classList.remove('mini');
+          } else if(!miniDismissed && en.boundingClientRect.top < 0){
+            playerMock.classList.add('mini');
+          }
+        });
+      }, { threshold: 0 });
+      observer.observe(sentinel);
+    }
+    miniClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playerMock.classList.remove('mini');
+      miniDismissed = true;
+    });
+    playerMock.addEventListener('click', () => {
+      if(playerMock.classList.contains('mini')){
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
 
     let initialFlatIndex = 0;
 

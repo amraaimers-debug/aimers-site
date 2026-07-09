@@ -17,6 +17,14 @@ function sheetUrl(tabName){
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
 }
 
+// Sheet থেকে আসা যেকোনো টেক্সট HTML-এ বসানোর আগে এটা দিয়ে পাস করাতে হবে —
+// এতে কেউ Sheet-এ <script> বা HTML ট্যাগ ঢুকিয়ে দিলেও সেটা কোড হিসেবে চলবে না, শুধু প্লেইন টেক্সট হিসেবে দেখাবে
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
 // সাবজেক্টের ভিজ্যুয়াল তথ্য (নাম, আইকন-অক্ষর, রঙ) — এটা ডিজাইনের অংশ, তাই কোডেই থাকে
 const SUBJECTS = {
   bangla:      { name: 'বাংলা',        icon: 'অ', accent: '#00f0ff' },
@@ -204,4 +212,32 @@ function getSubjectProgress(classId, subjectKey){
   const watched = getWatchedSet();
   const watchedCount = items.filter(it => watched.has(topicKey(classId, subjectKey, it.chapter, it.title))).length;
   return { watched: watchedCount, total: items.length };
+}
+
+// "যেখানে ছিলে সেখান থেকে চালিয়ে যাও" — সবচেয়ে শেষে যে টপিক খোলা হয়েছিল সেটা মনে রাখে
+const LAST_WATCHED_KEY = 'aimers_last_watched';
+
+function setLastWatched(classId, subjectKey, chapterName, topicTitle){
+  try{
+    localStorage.setItem(LAST_WATCHED_KEY, JSON.stringify({ classId, subjectKey, chapterName, topicTitle, ts: Date.now() }));
+  }catch(e){ /* skip */ }
+}
+
+function getLastWatched(){
+  try{
+    return JSON.parse(localStorage.getItem(LAST_WATCHED_KEY) || 'null');
+  }catch(e){
+    return null;
+  }
+}
+
+// অটো-প্লে চালু/বন্ধ পছন্দ — ডিফল্ট চালু থাকে
+const AUTOPLAY_KEY = 'aimers_autoplay';
+
+function getAutoplayPref(){
+  try{ return localStorage.getItem(AUTOPLAY_KEY) !== 'off'; }catch(e){ return true; }
+}
+
+function setAutoplayPref(on){
+  try{ localStorage.setItem(AUTOPLAY_KEY, on ? 'on' : 'off'); }catch(e){ /* skip */ }
 }

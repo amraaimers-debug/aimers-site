@@ -33,6 +33,18 @@
   .watch-title{ margin-top:20px; font-size:22px; font-weight:700; }
   .watch-meta{ margin-top:8px; font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--muted); letter-spacing:0.5px; }
 
+  .watch-actions{ margin-top:18px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+  .autoplay-toggle{
+    display:flex; align-items:center; gap:8px; font-family:'Rajdhani',sans-serif;
+    font-size:13px; color:var(--muted); cursor:pointer; user-select:none;
+  }
+  .autoplay-toggle input{ accent-color:var(--cyan); width:16px; height:16px; cursor:pointer; }
+  #nextTopicBtn:disabled{ opacity:0.35; cursor:default; box-shadow:none; }
+
+  #ytPlayer{ width:100%; height:100%; }
+  #ytPlayer iframe{ width:100%; height:100%; display:block; }
+  .empty-note{ position:absolute; inset:0; }
+
   .empty-note{
     display:flex; flex-direction:column; align-items:center; gap:10px;
     color:var(--muted); text-align:center; padding:0 20px;
@@ -144,7 +156,10 @@
         <span class="tech player-ch" id="playerTag">CLASS_00 · সাবজেক্ট</span>
       </div>
       <div class="player-screen" id="playerScreen">
-        <div class="empty-note">
+        <div id="ytPlayerWrap" style="display:none; position:absolute; inset:0;">
+          <div id="ytPlayer"></div>
+        </div>
+        <div class="empty-note" id="emptyNote">
           <div class="ring">▶</div>
           <div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div>
         </div>
@@ -152,6 +167,13 @@
     </div>
     <div class="watch-title" id="watchTitle">অধ্যায় শিরোনাম</div>
     <div class="watch-meta tech" id="watchMeta">CHAPTER 01 OF 00</div>
+    <div class="watch-actions">
+      <button class="cta-btn" id="nextTopicBtn">পরের টপিক →</button>
+      <label class="autoplay-toggle">
+        <input type="checkbox" id="autoplayToggle">
+        অটো-প্লে পরবর্তী
+      </label>
+    </div>
   </div>
 
   <div class="chapter-panel" id="chapterPanel" style="display:none;">
@@ -199,6 +221,7 @@
   <div class="tech">MADE IN BANGLADESH</div>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script src="data.js"></script>
 <script>
   const params = new URLSearchParams(window.location.search);
@@ -207,6 +230,49 @@
   const wantChapter = params.get('chapter'); // ঐচ্ছিক — দেওয়া থাকলে সেটাই খোলা অবস্থায় শুরু হবে
   const wantTopic = params.get('topic');
   const loadState = document.getElementById('loadState');
+
+  // ---- YouTube IFrame API সেটআপ ----
+  let ytPlayer = null;
+  let ytApiReady = false;
+  let pendingVideoId = null;
+  let goToNext = function(){}; // main() এর ভিতরে আসল লজিক বসবে, কিন্তু ভ্যারিয়েবলটা এখানেই ডিক্লেয়ার — যাতে createOrLoadPlayer এটা কল করতে পারে
+
+  window.onYouTubeIframeAPIReady = function(){
+    ytApiReady = true;
+    if(pendingVideoId) createOrLoadPlayer(pendingVideoId);
+  };
+
+  function createOrLoadPlayer(videoId){
+    document.getElementById('emptyNote').style.display = 'none';
+    document.getElementById('ytPlayerWrap').style.display = 'block';
+    if(ytPlayer && ytPlayer.loadVideoById){
+      ytPlayer.loadVideoById(videoId);
+      return;
+    }
+    ytPlayer = new YT.Player('ytPlayer', {
+      videoId: videoId,
+      playerVars: { rel: 0 },
+      events: {
+        onStateChange: function(e){
+          if(e.data === YT.PlayerState.ENDED && getAutoplayPref()){
+            goToNext();
+          }
+        }
+      }
+    });
+  }
+
+  function showVideo(videoId){
+    if(!videoId){
+      document.getElementById('ytPlayerWrap').style.display = 'none';
+      document.getElementById('emptyNote').style.display = 'flex';
+      if(ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+      return;
+    }
+    pendingVideoId = videoId;
+    if(ytApiReady) createOrLoadPlayer(videoId);
+    // ready না হলে API লোড হওয়ার পর onYouTubeIframeAPIReady নিজেই pendingVideoId চালাবে
+  }
 
   async function main(){
     try{
@@ -238,8 +304,8 @@
       loadState.className = 'state-screen';
       loadState.innerHTML = `
         <div class="tech">এই সাবজেক্টে এখনো কোনো ভিডিও যুক্ত হয়নি</div>
-        <p>শীঘ্রই ${subj.name} (ক্লাস ${cls.num}) এর ভিডিও যুক্ত হবে।</p>
-        <a class="cta-btn retry-btn" href="subject.html?class=${cls.id}">অন্য সাবজেক্ট দেখো</a>
+        <p>শীঘ্রই ${escapeHtml(subj.name)} (ক্লাস ${escapeHtml(cls.num)}) এর ভিডিও যুক্ত হবে।</p>
+        <a class="cta-btn retry-btn" href="subject.html?class=${encodeURIComponent(cls.id)}">অন্য সাবজেক্ট দেখো</a>
       `;
       return;
     }
@@ -254,29 +320,13 @@
     document.title = `${subj.name} — ক্লাস ${cls.num} — Aimers`;
 
     const listEl = document.getElementById('chapterList');
-    const screenEl = document.getElementById('playerScreen');
+    const nextBtn = document.getElementById('nextTopicBtn');
+    const autoplayToggle = document.getElementById('autoplayToggle');
+    autoplayToggle.checked = getAutoplayPref();
+    autoplayToggle.addEventListener('change', () => setAutoplayPref(autoplayToggle.checked));
 
-    function renderTopic(chapterName, topics, index, rowEl, group){
-      const tp = topics[index];
-      document.getElementById('playerTag').textContent = `CLASS_${cls.id.padStart(2,'0')} · ${subj.name} · ${chapterName}`;
-      document.getElementById('watchTitle').textContent = tp.title;
-      document.getElementById('watchMeta').textContent = `TOPIC ${String(index+1).padStart(2,'0')} OF ${String(topics.length).padStart(2,'0')} — ${chapterName}`;
-
-      screenEl.innerHTML = tp.youtubeId
-        ? `<iframe width="100%" height="100%" style="border:0;" src="https://www.youtube.com/embed/${tp.youtubeId}" title="${tp.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
-        : `<div class="empty-note"><div class="ring">▶</div><div class="tech">ভিডিও শীঘ্রই যুক্ত হবে</div></div>`;
-
-      document.querySelectorAll('.chap-row.active').forEach(r => r.classList.remove('active'));
-      rowEl.classList.add('active');
-
-      // ভিডিও থাকলেই "দেখা হয়েছে" হিসেবে মার্ক হবে, প্লেসহোল্ডার হলে না
-      if(tp.youtubeId){
-        markWatched(cls.id, subjectKey, chapterName, tp.title);
-        const mark = rowEl.querySelector('.status-mark');
-        if(mark) mark.textContent = '✓';
-        updateGroupCount(group, chapterName, topics);
-      }
-    }
+    const flatTopics = []; // { chapterName, topics, index, row, group, tp }
+    let currentFlat = -1;
 
     function updateGroupCount(group, chapterName, topics){
       const countEl = group.querySelector('.head-count');
@@ -285,7 +335,50 @@
       countEl.innerHTML = watchedCount > 0 ? `<span class="w">${watchedCount}</span>/${topics.length}` : `${topics.length}`;
     }
 
-    let firstRowToPlay = null;
+    function updateNextButton(){
+      if(currentFlat >= flatTopics.length - 1){
+        nextBtn.textContent = 'শেষ টপিক ✓';
+        nextBtn.disabled = true;
+      } else {
+        nextBtn.textContent = 'পরের টপিক →';
+        nextBtn.disabled = false;
+      }
+    }
+
+    function renderByFlatIndex(flatIndex){
+      if(flatIndex < 0 || flatIndex >= flatTopics.length) return;
+      currentFlat = flatIndex;
+      const entry = flatTopics[flatIndex];
+      const { chapterName, topics, index, row, group, tp } = entry;
+
+      document.getElementById('playerTag').textContent = `CLASS_${cls.id.padStart(2,'0')} · ${subj.name} · ${chapterName}`;
+      document.getElementById('watchTitle').textContent = tp.title;
+      document.getElementById('watchMeta').textContent = `TOPIC ${String(index+1).padStart(2,'0')} OF ${String(topics.length).padStart(2,'0')} — ${chapterName}`;
+
+      showVideo(tp.youtubeId || null);
+
+      document.querySelectorAll('.chap-row.active').forEach(r => r.classList.remove('active'));
+      row.classList.add('active');
+      group.classList.add('open');
+      row.scrollIntoView({ block: 'nearest' });
+
+      if(tp.youtubeId){
+        markWatched(cls.id, subjectKey, chapterName, tp.title);
+        setLastWatched(cls.id, subjectKey, chapterName, tp.title);
+        const mark = row.querySelector('.status-mark');
+        if(mark) mark.textContent = '✓';
+        updateGroupCount(group, chapterName, topics);
+      }
+
+      updateNextButton();
+    }
+
+    goToNext = function(){
+      if(currentFlat < flatTopics.length - 1) renderByFlatIndex(currentFlat + 1);
+    };
+    nextBtn.addEventListener('click', goToNext);
+
+    let initialFlatIndex = 0;
 
     chapterNames.forEach((chapterName, ci) => {
       const topics = getTopics(cls.id, subjectKey, chapterName);
@@ -297,7 +390,7 @@
       head.className = 'chap-head';
       head.innerHTML = `
         <span class="chevron">▶</span>
-        <span class="name">${chapterName}</span>
+        <span class="name">${escapeHtml(chapterName)}</span>
         <span class="head-count tech"></span>
       `;
       head.addEventListener('click', () => group.classList.toggle('open'));
@@ -312,16 +405,19 @@
         row.tabIndex = 0;
         row.innerHTML = `
           <span class="num tech">${String(ti+1).padStart(2,'0')}</span>
-          <span class="t">${tp.title}</span>
+          <span class="t">${escapeHtml(tp.title)}</span>
           <span class="status-mark">${watched ? '✓' : ''}</span>
         `;
-        row.addEventListener('click', () => renderTopic(chapterName, topics, ti, row, group));
-        row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderTopic(chapterName, topics, ti, row, group); });
         body.appendChild(row);
+
+        flatTopics.push({ chapterName, topics, index: ti, row, group, tp });
+        const flatIdx = flatTopics.length - 1;
+        row.addEventListener('click', () => renderByFlatIndex(flatIdx));
+        row.addEventListener('keydown', (e) => { if(e.key === 'Enter') renderByFlatIndex(flatIdx); });
 
         const isWanted = wantChapter === chapterName && (wantTopic ? wantTopic === tp.title : ti === 0);
         if(isWanted || (!wantChapter && ci === 0 && ti === 0)){
-          firstRowToPlay = { chapterName, topics, index: ti, row, group };
+          initialFlatIndex = flatIdx;
         }
       });
 
@@ -331,10 +427,7 @@
       updateGroupCount(group, chapterName, topics);
     });
 
-    if(firstRowToPlay){
-      firstRowToPlay.group.classList.add('open');
-      renderTopic(firstRowToPlay.chapterName, firstRowToPlay.topics, firstRowToPlay.index, firstRowToPlay.row, firstRowToPlay.group);
-    }
+    renderByFlatIndex(initialFlatIndex);
   }
 
   main();

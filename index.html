@@ -69,6 +69,8 @@
     <div class="chip-row" id="chipRow"></div>
 </div>
 
+<div id="continueWrap"></div>
+
 <section class="section-wrap" id="classes">
   <div class="section-head">
     <h2>ক্লাস অনুযায়ী ব্রাউজ করো</h2>
@@ -161,9 +163,9 @@
       card.tabIndex = 0;
       card.innerHTML = `
         ${c.ready ? '' : '<div class="badge">শীঘ্রই</div>'}
-        <div class="id tech">${c.roll}</div>
-        <h3>ক্লাস ${c.num}</h3>
-        <div class="sub">${subjectLabel}</div>
+        <div class="id tech">${escapeHtml(c.roll)}</div>
+        <h3>ক্লাস ${escapeHtml(c.num)}</h3>
+        <div class="sub">${escapeHtml(subjectLabel)}</div>
         ${c.ready ? '<div class="go">সাবজেক্ট দেখো →</div>' : ''}
       `;
       if(c.ready){
@@ -201,6 +203,28 @@
     const readyClasses = CLASSES.filter(c => c.ready);
     subjCount.textContent = `${readyClasses.length} CLASSES · MORE INCOMING`;
 
+    // "যেখানে ছিলে সেখান থেকে চালিয়ে যাও"
+    const lastWatched = getLastWatched();
+    if(lastWatched){
+      const lwClass = getClass(lastWatched.classId);
+      if(lwClass && lwClass.subjects.includes(lastWatched.subjectKey)){
+        const lwSubj = getSubject(lastWatched.subjectKey);
+        const link = `video.html?class=${encodeURIComponent(lastWatched.classId)}&subject=${encodeURIComponent(lastWatched.subjectKey)}&chapter=${encodeURIComponent(lastWatched.chapterName)}&topic=${encodeURIComponent(lastWatched.topicTitle)}`;
+        document.getElementById('continueWrap').innerHTML = `
+          <a class="continue-banner" href="${link}">
+            <div class="cb-left">
+              <div class="cb-icon">▶</div>
+              <div>
+                <div class="cb-tag tech">চালিয়ে যাও · CLASS_${escapeHtml(lastWatched.classId.padStart(2,'0'))} · ${escapeHtml(lwSubj.name)}</div>
+                <div class="cb-title">${escapeHtml(lastWatched.topicTitle)}</div>
+              </div>
+            </div>
+            <div class="go tech" style="opacity:1; color:var(--cyan);">চালিয়ে যাও →</div>
+          </a>
+        `;
+      }
+    }
+
     const subjectSet = new Set();
     readyClasses.forEach(c => c.subjects.forEach(s => subjectSet.add(s)));
 
@@ -217,7 +241,7 @@
     // ফুটার ক্লাস লিংক
     readyClasses.forEach(c => {
       const li = document.createElement('li');
-      li.innerHTML = `<a href="subject.html?class=${c.id}">ক্লাস ${c.num}</a>`;
+      li.innerHTML = `<a href="subject.html?class=${encodeURIComponent(c.id)}">ক্লাস ${escapeHtml(c.num)}</a>`;
       footerClassLinks.appendChild(li);
     });
 
@@ -233,12 +257,12 @@
         card.className = 'recent-card';
         card.innerHTML = `
           <div class="recent-thumb">
-            <img src="https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg" alt="${v.title}" loading="lazy">
+            <img src="https://i.ytimg.com/vi/${encodeURIComponent(v.youtubeId)}/hqdefault.jpg" alt="${escapeHtml(v.title)}" loading="lazy">
             <div class="play">▶</div>
           </div>
           <div class="recent-body">
-            <div class="recent-tag tech">CLASS_${v.classId.padStart(2,'0')} · ${subj.name}</div>
-            <div class="recent-title">${v.title}</div>
+            <div class="recent-tag tech">CLASS_${escapeHtml(v.classId.padStart(2,'0'))} · ${escapeHtml(subj.name)}</div>
+            <div class="recent-title">${escapeHtml(v.title)}</div>
           </div>
         `;
         card.addEventListener('click', () => { window.location.href = `video.html?class=${v.classId}&subject=${v.subjectKey}&chapter=${encodeURIComponent(v.chapter)}&topic=${encodeURIComponent(v.title)}`; });

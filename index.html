@@ -23,9 +23,22 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://aimers-site.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "Aimers",
+  "url": "https://aimers-site.vercel.app/",
+  "logo": "https://aimers-site.vercel.app/favicon-192.png",
+  "description": "ক্লাস ৫ থেকে ১২ এর জন্য চ্যাপ্টার-ভিত্তিক ফ্রি ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, বিজ্ঞান, আইসিটি।",
+  "sameAs": [
+    "https://www.youtube.com/@AIMERS-24h",
+    "https://www.facebook.com/aimer24h"
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -51,9 +64,58 @@
   (function(){
     var t = document.getElementById('menuToggle');
     var m = document.getElementById('mobileNav');
-    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+    if(!t || !m) return;
+
+    function closeMenu(){ m.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    function openMenu(){ m.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
+
+    t.setAttribute('aria-expanded', 'false');
+    t.setAttribute('aria-controls', 'mobileNav');
+
+    t.addEventListener('click', function(e){
+      e.stopPropagation();
+      m.classList.contains('open') ? closeMenu() : openMenu();
+    });
+
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function(e){
+      if(m.classList.contains('open') && !m.contains(e.target) && e.target !== t){
+        closeMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && m.classList.contains('open')) closeMenu();
+    });
+  })();
+
+  (function(){
+    var banner = document.getElementById('offlineBanner');
+    function updateOnlineStatus(){
+      if(!banner) return;
+      banner.style.display = navigator.onLine ? 'none' : 'flex';
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    var backToTop = document.getElementById('backToTop');
+    if(backToTop){
+      window.addEventListener('scroll', function(){
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+      backToTop.addEventListener('click', function(){
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    }
   })();
 </script>
+<div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>
+
 
 <div class="hero">
     <div class="eyebrow tech">CLASS_05 → CLASS_12</div>
@@ -64,9 +126,10 @@
       <a class="ghost-btn tech" href="#classes">সব ক্লাস দেখো →</a>
     </div>
     <div class="hero-search">
-      <input type="text" id="searchInput" placeholder="ক্লাস বা সাবজেক্ট খুঁজো... (যেমন: ৮ অথবা গণিত)">
+      <input type="text" id="searchInput" placeholder="ক্লাস, সাবজেক্ট বা টপিক খুঁজো... (যেমন: ৮, গণিত, গুণ)">
       <button id="searchBtn" class="tech">খুঁজো</button>
     </div>
+    <div class="search-results" id="searchResults" style="display:none;"></div>
     <div class="chip-row" id="chipRow"></div>
 </div>
 
@@ -75,7 +138,13 @@
 <section class="section-wrap" id="classes">
   <div class="section-head">
     <h2>ক্লাস অনুযায়ী ব্রাউজ করো</h2>
-    <span class="tech" id="subjCount">LOADING...</span>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <select class="sort-select" id="sortSelect" aria-label="সাজানোর ক্রম">
+        <option value="default">ক্লাস নম্বর অনুযায়ী</option>
+        <option value="recent">সাম্প্রতিক আপডেট অনুযায়ী</option>
+      </select>
+      <span class="tech" id="subjCount">LOADING...</span>
+    </div>
   </div>
   <div id="loadState" class="skeleton-grid">
     <div class="skeleton skeleton-card"><div class="skeleton-line w40"></div><div class="skeleton-line w80"></div><div class="skeleton-line w60"></div></div>
@@ -134,7 +203,7 @@
 
 <script src="data.js"></script>
 <script>
-  const accents = ['#00f0ff','#ff2e9a','#9d4dff','#ffd23f'];
+  const accents = ['#E8622C','#2F7FE0','#20A464','#FFB020'];
   const grid = document.getElementById('classGrid');
   const loadState = document.getElementById('loadState');
   const subjCount = document.getElementById('subjCount');
@@ -142,15 +211,35 @@
   const chipRow = document.getElementById('chipRow');
   const searchInput = document.getElementById('searchInput');
   const footerClassLinks = document.getElementById('footerClassLinks');
+  const sortSelect = document.getElementById('sortSelect');
+  const searchResults = document.getElementById('searchResults');
 
   let activeFilter = '';
+  let sortMode = 'default';
+
+  // ক্লাসের "সাম্প্রতিক আপডেট" র‍্যাংক — Chapters শিটে সবচেয়ে নিচের সারিতে যেই ক্লাসের এন্ট্রি আছে, সেটাই সবচেয়ে সাম্প্রতিক ধরা হয়
+  function getRecentRank(classId){
+    for(let i = ALL_CHAPTERS.length - 1; i >= 0; i--){
+      if(ALL_CHAPTERS[i].classId === classId) return i;
+    }
+    return -1;
+  }
+
+  function getSortedClasses(){
+    const ready = CLASSES.filter(c => c.ready);
+    const notReady = CLASSES.filter(c => !c.ready);
+    if(sortMode === 'recent'){
+      ready.sort((a, b) => getRecentRank(b.id) - getRecentRank(a.id));
+    }
+    return [...ready, ...notReady];
+  }
 
   function renderClasses(){
     grid.innerHTML = '';
     const q = activeFilter.trim().toLowerCase();
     let shown = 0;
 
-    CLASSES.forEach((c, i) => {
+    getSortedClasses().forEach((c, i) => {
       const subjectNames = c.subjects.map(k => getSubject(k).name);
       const matches = !q || c.num.includes(q) || c.id.includes(q) ||
         subjectNames.some(n => n.toLowerCase().includes(q));
@@ -187,6 +276,33 @@
     searchInput.value = val;
     [...chipRow.children].forEach(c => c.classList.toggle('active', c.dataset.val === val));
     renderClasses();
+  }
+
+  // ---- টপিক-লেভেল লাইভ সার্চ (বাংলা ও ইংলিশ দুটোই কাজ করে, যেহেতু সাধারণ substring match) ----
+  function updateTopicResults(query){
+    const q = query.trim().toLowerCase();
+    if(!q){ searchResults.style.display = 'none'; searchResults.innerHTML = ''; return; }
+
+    const matches = (typeof ALL_CHAPTERS !== 'undefined' ? ALL_CHAPTERS : [])
+      .filter(v => v.title.toLowerCase().includes(q))
+      .slice(0, 6);
+
+    if(matches.length === 0){
+      searchResults.style.display = '';
+      searchResults.innerHTML = `<div class="search-result-item empty">কোনো টপিক পাওয়া যায়নি — নিচে ক্লাস লিস্টে খুঁজে দেখো</div>`;
+      return;
+    }
+
+    searchResults.style.display = '';
+    searchResults.innerHTML = matches.map(v => {
+      const cls = getClass(v.classId);
+      const subj = getSubject(v.subjectKey);
+      const link = `video.html?class=${encodeURIComponent(v.classId)}&subject=${encodeURIComponent(v.subjectKey)}&chapter=${encodeURIComponent(v.chapter)}&topic=${encodeURIComponent(v.title)}`;
+      return `<a class="search-result-item" href="${link}">
+        <div class="tag tech">CLASS_${escapeHtml(v.classId.padStart(2,'0'))} · ${escapeHtml(subj.name)}</div>
+        <div>${escapeHtml(v.title)}</div>
+      </a>`;
+    }).join('');
   }
 
   async function main(){
@@ -276,13 +392,31 @@
     renderClasses();
   }
 
-  searchInput.addEventListener('input', () => setFilter(searchInput.value));
+  searchInput.addEventListener('input', () => {
+    setFilter(searchInput.value);
+    updateTopicResults(searchInput.value);
+  });
   document.getElementById('searchBtn').addEventListener('click', () => {
     document.getElementById('classes').scrollIntoView({behavior:'smooth'});
+  });
+
+  document.addEventListener('click', (e) => {
+    if(!searchResults.contains(e.target) && e.target !== searchInput){
+      searchResults.style.display = 'none';
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') searchResults.style.display = 'none';
+  });
+
+  sortSelect.addEventListener('change', () => {
+    sortMode = sortSelect.value;
+    renderClasses();
   });
 
   main();
 </script>
 
+<button class="back-to-top" id="backToTop" aria-label="উপরে যাও">↑</button>
 </body>
 </html>

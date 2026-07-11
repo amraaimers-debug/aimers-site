@@ -19,8 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://aimers-site.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
   .watch-wrap{
@@ -28,43 +27,43 @@
     padding:4vh 6vw 12vh; align-items:start;
   }
   .watch-main .player-mock{ padding:0; overflow:hidden; }
-  .watch-main .player-screen{ height:min(52vh, 460px); }
+  .watch-main .player-screen{ height:min(52vh, 460px); border-radius:18px 18px 0 0; }
   .watch-main .player-mock .player-top{ padding:14px 16px 0; }
   .watch-main .player-mock .player-bar{ padding:0 16px 14px; }
-  .watch-title{ margin-top:20px; font-size:22px; font-weight:700; }
-  .watch-meta{ margin-top:8px; font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--muted); letter-spacing:0.5px; }
+  .watch-title{ margin:20px 0 0 0; font-size:22px; font-weight:700; font-family:'Baloo Da 2',sans-serif; }
+  .watch-meta{ margin-top:8px; font-size:13px; color:var(--muted); font-weight:600; }
 
   .watch-actions{ margin-top:18px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
   .autoplay-toggle{
-    display:flex; align-items:center; gap:8px; font-family:'Rajdhani',sans-serif;
-    font-size:13px; color:var(--muted); cursor:pointer; user-select:none;
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; color:var(--muted); cursor:pointer; user-select:none; font-weight:600;
   }
   .autoplay-toggle input{ accent-color:var(--cyan); width:16px; height:16px; cursor:pointer; }
-  #nextTopicBtn:disabled{ opacity:0.35; cursor:default; box-shadow:none; }
+  #nextTopicBtn:disabled{ opacity:0.4; cursor:default; box-shadow:none; }
 
   .share-btn{
-    font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; color:var(--text);
-    background:none; border:1px solid var(--line); padding:10px 18px; cursor:pointer;
-    transition:border-color .2s, color .2s; letter-spacing:0.5px;
+    font-weight:700; font-size:13px; color:var(--text);
+    background:none; border:1px solid var(--line); border-radius:10px; padding:10px 18px; cursor:pointer;
+    transition:border-color .2s, color .2s;
   }
   .share-btn:hover{ border-color:var(--cyan); color:var(--cyan); }
-  .share-btn.copied{ border-color:var(--yellow); color:var(--yellow); }
+  .share-btn.copied{ border-color:var(--yellow); color:#8a5300; }
 
   /* মোবাইলে স্ক্রল করলে প্লেয়ার ছোট হয়ে উপরে "মিনি" আকারে লেগে থাকে */
   .mini-close{
-    display:none; position:absolute; top:6px; right:6px; z-index:6; width:24px; height:24px;
-    background:rgba(8,6,15,0.75); color:var(--text); border:1px solid var(--line); border-radius:50%;
-    align-items:center; justify-content:center; cursor:pointer; font-size:12px;
+    display:none; position:absolute; top:4px; right:4px; z-index:6; width:32px; height:32px;
+    background:rgba(18,33,63,0.55); color:#fff; border:none; border-radius:50%;
+    align-items:center; justify-content:center; cursor:pointer; font-size:13px;
   }
   @media (max-width:900px){
     .player-mock.mini{
       position:fixed; top:auto; bottom:16px; right:16px; left:auto;
-      width:180px; height:105px; z-index:90;
-      box-shadow:0 10px 34px rgba(0,0,0,0.55); border-color:var(--cyan);
+      width:180px; height:105px; z-index:90; border-radius:16px;
+      box-shadow:0 14px 34px rgba(18,33,63,0.35); border-color:var(--cyan);
     }
     .player-mock.mini .player-top,
     .player-mock.mini .player-bar{ display:none; }
-    .player-mock.mini .player-screen{ height:100%; }
+    .player-mock.mini .player-screen{ height:100%; border-radius:16px; }
     .player-mock.mini .mini-close{ display:flex; }
   }
 
@@ -77,50 +76,50 @@
     color:var(--muted); text-align:center; padding:0 20px;
   }
   .empty-note .ring{
-    width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--cyan);
+    width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--cyan); background:var(--panel);
     display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--cyan);
   }
   .empty-note .tech{ font-size:12px; }
 
   .chapter-panel{
-    background:var(--panel); border:1px solid var(--line); padding:16px;
-    max-height:640px; overflow-y:auto;
+    background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:16px;
+    max-height:640px; overflow-y:auto; box-shadow:0 4px 20px rgba(18,33,63,0.06);
   }
   .chapter-panel h4{
-    font-family:'Rajdhani',sans-serif; font-size:14px; letter-spacing:1px; color:var(--muted);
+    font-size:14px; color:var(--muted); font-weight:700;
     padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:6px;
   }
 
   .chap-group{ border-bottom:1px solid var(--line); }
   .chap-group:last-child{ border-bottom:none; }
   .chap-head{
-    display:flex; align-items:center; gap:10px; padding:14px 8px; cursor:pointer;
+    display:flex; align-items:center; gap:10px; padding:14px 8px; cursor:pointer; border-radius:8px;
     transition:background .2s;
   }
-  .chap-head:hover{ background:rgba(0,240,255,0.05); }
+  .chap-head:hover{ background:#F5F8FF; }
   .chap-head .chevron{
-    font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--cyan);
+    font-size:12px; color:var(--cyan);
     transition:transform .25s; flex-shrink:0;
   }
   .chap-group.open .chap-head .chevron{ transform:rotate(90deg); }
-  .chap-head .name{ font-size:14px; font-weight:600; color:var(--text); flex:1; }
-  .chap-head .count{ font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--muted); }
+  .chap-head .name{ font-size:14px; font-weight:700; color:var(--text); flex:1; }
+  .chap-head .count{ font-size:11px; color:var(--muted); font-weight:700; }
 
   .chap-body{ display:none; padding-bottom:8px; }
   .chap-group.open .chap-body{ display:block; }
 
   .chap-row{
-    display:flex; align-items:center; gap:12px; padding:10px 8px 10px 26px; cursor:pointer;
+    display:flex; align-items:center; gap:12px; padding:10px 8px 10px 26px; cursor:pointer; border-radius:8px;
     border-left:2px solid transparent; transition:background .2s, border-color .2s;
   }
-  .chap-row:hover{ background:rgba(0,240,255,0.05); }
-  .chap-row.active{ background:rgba(0,240,255,0.08); border-left-color:var(--cyan); }
-  .chap-row .num{ font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); width:22px; flex-shrink:0; }
+  .chap-row:hover{ background:#F5F8FF; }
+  .chap-row.active{ background:#EAF2FE; border-left-color:var(--cyan); }
+  .chap-row .num{ font-size:12px; color:var(--muted); width:22px; flex-shrink:0; font-weight:600; }
   .chap-row.active .num{ color:var(--cyan); }
   .chap-row .t{ font-size:13.5px; color:var(--text); line-height:1.5; }
   .status-mark{
     margin-left:auto; width:16px; text-align:center; flex-shrink:0;
-    font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--cyan); font-weight:700;
+    font-size:13px; color:var(--cyan); font-weight:700;
     display:inline-block;
   }
   .status-mark:empty::before{
@@ -131,8 +130,8 @@
     55%{ transform:scale(1.4); opacity:1; }
     100%{ transform:scale(1); opacity:1; }
   }
-  .status-mark.pop{ animation:mark-pop .45s cubic-bezier(.34,1.56,.64,1); text-shadow:0 0 10px var(--cyan); }
-  .chap-head .head-count{ font-family:'Rajdhani',sans-serif; font-size:11px; color:var(--muted); }
+  .status-mark.pop{ animation:mark-pop .45s cubic-bezier(.34,1.56,.64,1); }
+  .chap-head .head-count{ font-size:11px; color:var(--muted); font-weight:700; }
   .chap-head .head-count .w{ color:var(--cyan); }
 
   @media (max-width:900px){
@@ -167,9 +166,58 @@
   (function(){
     var t = document.getElementById('menuToggle');
     var m = document.getElementById('mobileNav');
-    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+    if(!t || !m) return;
+
+    function closeMenu(){ m.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    function openMenu(){ m.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
+
+    t.setAttribute('aria-expanded', 'false');
+    t.setAttribute('aria-controls', 'mobileNav');
+
+    t.addEventListener('click', function(e){
+      e.stopPropagation();
+      m.classList.contains('open') ? closeMenu() : openMenu();
+    });
+
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function(e){
+      if(m.classList.contains('open') && !m.contains(e.target) && e.target !== t){
+        closeMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && m.classList.contains('open')) closeMenu();
+    });
+  })();
+
+  (function(){
+    var banner = document.getElementById('offlineBanner');
+    function updateOnlineStatus(){
+      if(!banner) return;
+      banner.style.display = navigator.onLine ? 'none' : 'flex';
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    var backToTop = document.getElementById('backToTop');
+    if(backToTop){
+      window.addEventListener('scroll', function(){
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+      backToTop.addEventListener('click', function(){
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    }
   })();
 </script>
+<div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>
+
 
 <div class="breadcrumb tech">
   <a href="index.html">AIMERS</a>
@@ -212,7 +260,7 @@
       </div>
     </div>
     <div id="scrollSentinel"></div>
-    <div class="watch-title" id="watchTitle">অধ্যায় শিরোনাম</div>
+    <h1 class="watch-title" id="watchTitle">অধ্যায় শিরোনাম</h1>
     <div class="watch-meta tech" id="watchMeta">CHAPTER 01 OF 00</div>
     <div class="watch-actions">
       <button class="cta-btn" id="nextTopicBtn">পরের টপিক →</button>
@@ -366,6 +414,20 @@
     document.getElementById('crumbClass').href = `subject.html?class=${cls.id}`;
     document.getElementById('crumbSubject').textContent = subj.name;
     document.title = `${subj.name} — ক্লাস ${cls.num} — Aimers`;
+
+    // JSON-LD breadcrumb — SEO-এর জন্য, বাকি কোনো লজিক প্রভাবিত করে না
+    const breadcrumbScript = document.createElement('script');
+    breadcrumbScript.type = 'application/ld+json';
+    breadcrumbScript.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "AIMERS", "item": "https://aimers-site.vercel.app/" },
+        { "@type": "ListItem", "position": 2, "name": `ক্লাস ${cls.num}`, "item": `https://aimers-site.vercel.app/subject.html?class=${cls.id}` },
+        { "@type": "ListItem", "position": 3, "name": subj.name, "item": `https://aimers-site.vercel.app/video.html?class=${cls.id}&subject=${subjectKey}` }
+      ]
+    });
+    document.head.appendChild(breadcrumbScript);
 
     const listEl = document.getElementById('chapterList');
     const nextBtn = document.getElementById('nextTopicBtn');
@@ -544,5 +606,6 @@
   main();
 </script>
 
+<button class="back-to-top" id="backToTop" aria-label="উপরে যাও">↑</button>
 </body>
 </html>

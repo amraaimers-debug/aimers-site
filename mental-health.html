@@ -19,51 +19,60 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://aimers-site.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "AIMERS", "item": "https://aimers-site.vercel.app/" },
+    { "@type": "ListItem", "position": 2, "name": "মানসিক স্বাস্থ্য", "item": "https://aimers-site.vercel.app/mental-health.html" }
+  ]
+}
+</script>
 <style>
   .watch-wrap{
     display:grid; grid-template-columns:1fr 340px; gap:22px;
     padding:4vh 6vw 12vh; align-items:start;
   }
   .watch-main .player-mock{ padding:0; overflow:hidden; }
-  .watch-main .player-screen{ height:min(52vh, 460px); }
+  .watch-main .player-screen{ height:min(52vh, 460px); border-radius:18px 18px 0 0; }
   .watch-main .player-mock .player-top{ padding:14px 16px 0; }
   .watch-main .player-mock .player-bar{ padding:0 16px 14px; }
-  .watch-title{ margin-top:20px; font-size:22px; font-weight:700; }
-  .watch-meta{ margin-top:8px; font-family:'Rajdhani',sans-serif; font-size:13px; color:var(--muted); letter-spacing:0.5px; }
+  .watch-title{ margin-top:20px; font-size:22px; font-weight:700; font-family:'Baloo Da 2',sans-serif; }
+  .watch-meta{ margin-top:8px; font-size:13px; color:var(--muted); font-weight:600; }
 
   .empty-note{
     display:flex; flex-direction:column; align-items:center; gap:10px;
     color:var(--muted); text-align:center; padding:0 20px;
   }
   .empty-note .ring{
-    width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--purple);
+    width:52px; height:52px; border-radius:50%; border:1.5px dashed var(--purple); background:var(--panel);
     display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--purple);
   }
   .empty-note .tech{ font-size:12px; }
 
   .ep-panel{
-    background:var(--panel); border:1px solid var(--line); padding:16px;
-    max-height:640px; overflow-y:auto;
+    background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:16px;
+    max-height:640px; overflow-y:auto; box-shadow:0 4px 20px rgba(18,33,63,0.06);
   }
   .ep-panel h4{
-    font-family:'Rajdhani',sans-serif; font-size:14px; letter-spacing:1px; color:var(--muted);
+    font-size:14px; color:var(--muted); font-weight:700;
     padding-bottom:12px; border-bottom:1px solid var(--line); margin-bottom:6px;
   }
   .ep-row{
-    display:flex; align-items:center; gap:12px; padding:12px 8px; cursor:pointer;
+    display:flex; align-items:center; gap:12px; padding:12px 8px; cursor:pointer; border-radius:8px;
     border-left:2px solid transparent; transition:background .2s, border-color .2s;
   }
-  .ep-row:hover{ background:rgba(157,77,255,0.07); }
-  .ep-row.active{ background:rgba(157,77,255,0.1); border-left-color:var(--purple); }
-  .ep-row .num{ font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); width:26px; flex-shrink:0; }
+  .ep-row:hover{ background:#F7F5FF; }
+  .ep-row.active{ background:#EFEBFF; border-left-color:var(--purple); }
+  .ep-row .num{ font-size:12px; color:var(--muted); width:26px; flex-shrink:0; font-weight:600; }
   .ep-row.active .num{ color:var(--purple); }
   .ep-row .t{ font-size:13.5px; color:var(--text); line-height:1.5; }
 
   .care-note{
-    margin:0 6vw 8vh; padding:20px 24px; border:1px solid var(--line); background:var(--panel);
+    margin:0 6vw 8vh; padding:20px 24px; border:1px solid var(--line); border-radius:16px; background:var(--panel);
     font-size:13px; color:var(--muted); line-height:1.8; max-width:900px;
   }
   .care-note strong{ color:var(--text); }
@@ -100,9 +109,58 @@
   (function(){
     var t = document.getElementById('menuToggle');
     var m = document.getElementById('mobileNav');
-    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+    if(!t || !m) return;
+
+    function closeMenu(){ m.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    function openMenu(){ m.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
+
+    t.setAttribute('aria-expanded', 'false');
+    t.setAttribute('aria-controls', 'mobileNav');
+
+    t.addEventListener('click', function(e){
+      e.stopPropagation();
+      m.classList.contains('open') ? closeMenu() : openMenu();
+    });
+
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function(e){
+      if(m.classList.contains('open') && !m.contains(e.target) && e.target !== t){
+        closeMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && m.classList.contains('open')) closeMenu();
+    });
+  })();
+
+  (function(){
+    var banner = document.getElementById('offlineBanner');
+    function updateOnlineStatus(){
+      if(!banner) return;
+      banner.style.display = navigator.onLine ? 'none' : 'flex';
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    var backToTop = document.getElementById('backToTop');
+    if(backToTop){
+      window.addEventListener('scroll', function(){
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+      backToTop.addEventListener('click', function(){
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    }
   })();
 </script>
+<div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>
+
 
 <div class="breadcrumb tech">
   <a href="index.html">AIMERS</a>
@@ -132,7 +190,7 @@
   <div class="watch-main" id="watchMain" style="display:none;">
     <div class="player-mock">
       <div class="player-top">
-        <span class="pulse-badge" style="background:var(--purple); box-shadow:0 0 10px var(--purple);"></span>
+        <span class="pulse-badge" style="background:var(--purple);"></span>
         <span class="tech player-tag">NOW PLAYING</span>
         <span class="tech player-ch">মানসিক স্বাস্থ্য</span>
       </div>
@@ -261,5 +319,6 @@
   main();
 </script>
 
+<button class="back-to-top" id="backToTop" aria-label="উপরে যাও">↑</button>
 </body>
 </html>

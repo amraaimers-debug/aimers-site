@@ -9,8 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
   .nf-wrap{
@@ -18,14 +17,13 @@
     text-align:center; padding:8vh 6vw;
   }
   .nf-code{
-    font-family:'Rajdhani',sans-serif; font-weight:700; font-size:clamp(90px,18vw,160px);
-    line-height:1; color:var(--bg); -webkit-text-stroke:2px var(--cyan);
-    text-shadow:0 0 30px rgba(0,240,255,0.35);
+    font-family:'Baloo Da 2',sans-serif; font-weight:800; font-size:clamp(90px,18vw,160px);
+    line-height:1; color:var(--cyan);
   }
-  .nf-code span{ -webkit-text-stroke:2px var(--magenta); text-shadow:0 0 30px rgba(255,46,154,0.35); }
-  .nf-title{ margin-top:10px; font-size:22px; font-weight:700; }
+  .nf-code span{ color:var(--magenta); }
+  .nf-title{ margin:10px 0 0 0; font-size:22px; font-weight:700; font-family:'Baloo Da 2',sans-serif; }
   .nf-sub{ margin-top:12px; color:var(--muted); font-size:14.5px; max-width:420px; line-height:1.8; }
-  .nf-tech{ margin-top:20px; font-family:'Rajdhani',sans-serif; font-size:12px; color:var(--muted); letter-spacing:2px; }
+  .nf-tech{ margin-top:20px; font-size:12px; color:var(--muted); font-weight:700; }
   .nf-ctas{ margin-top:34px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
 </style>
 </head>
@@ -53,13 +51,62 @@
   (function(){
     var t = document.getElementById('menuToggle');
     var m = document.getElementById('mobileNav');
-    if(t && m){ t.addEventListener('click', function(){ m.classList.toggle('open'); }); }
+    if(!t || !m) return;
+
+    function closeMenu(){ m.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    function openMenu(){ m.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
+
+    t.setAttribute('aria-expanded', 'false');
+    t.setAttribute('aria-controls', 'mobileNav');
+
+    t.addEventListener('click', function(e){
+      e.stopPropagation();
+      m.classList.contains('open') ? closeMenu() : openMenu();
+    });
+
+    m.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function(e){
+      if(m.classList.contains('open') && !m.contains(e.target) && e.target !== t){
+        closeMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && m.classList.contains('open')) closeMenu();
+    });
+  })();
+
+  (function(){
+    var banner = document.getElementById('offlineBanner');
+    function updateOnlineStatus(){
+      if(!banner) return;
+      banner.style.display = navigator.onLine ? 'none' : 'flex';
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    var backToTop = document.getElementById('backToTop');
+    if(backToTop){
+      window.addEventListener('scroll', function(){
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+      backToTop.addEventListener('click', function(){
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    }
   })();
 </script>
+<div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>
+
 
 <div class="nf-wrap">
   <div class="nf-code tech">4<span>0</span>4</div>
-  <div class="nf-title">এই পেইজটা খুঁজে পাওয়া যায়নি</div>
+  <h1 class="nf-title">এই পেইজটা খুঁজে পাওয়া যায়নি</h1>
   <p class="nf-sub">লিংকটা হয়তো ভুল, অথবা পেইজটা সরিয়ে ফেলা হয়েছে। চিন্তা নেই, হোমপেজ থেকে আবার শুরু করা যাক।</p>
   <div class="nf-tech">ERROR_CODE: PAGE_NOT_FOUND</div>
   <div class="nf-ctas">
@@ -107,5 +154,6 @@
   <div class="tech">MADE IN BANGLADESH</div>
 </div>
 
+<button class="back-to-top" id="backToTop" aria-label="উপরে যাও">↑</button>
 </body>
 </html>

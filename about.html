@@ -2,6 +2,14 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('aimers_theme');
+      if(saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    }catch(e){}
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>সম্পর্কে — Aimers</title>
 <meta name="description" content="Aimers কী, কাদের জন্য, এবং কেন বিনামূল্যে ক্লাস ৫ থেকে ১২ এর ভিডিও ক্লাস দেওয়া হচ্ছে — জানো এখানে।">
@@ -19,7 +27,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://aimers-site.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script type="application/ld+json">
 {
@@ -34,19 +42,20 @@
 <style>
   .about-body{ padding:0 6vw 8vh; max-width:720px; }
   .about-body p{ color:var(--muted); font-size:15.5px; line-height:1.9; margin-bottom:18px; }
-  .about-body p strong{ color:var(--text); font-weight:600; }
+  .about-body p strong{ color:var(--text); font-weight:700; }
 
   .why-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:16px; margin:32px 0 8px; }
-  .why-item{ background:var(--panel); border:1px solid var(--line); padding:20px; }
-  .why-item .num{ font-family:'Rajdhani',sans-serif; color:var(--cyan); font-size:13px; letter-spacing:1px; }
-  .why-item h4{ margin-top:8px; font-size:16px; font-weight:700; }
+  .why-item{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 2px 10px rgba(18,33,63,0.04); }
+  .why-item .num{ color:var(--cyan); font-size:13px; font-weight:700; }
+  .why-item h4{ margin-top:8px; font-size:16px; font-weight:700; font-family:'Baloo Da 2',sans-serif; }
   .why-item p{ margin-top:8px; font-size:13px; color:var(--muted); line-height:1.7; }
 
   .about-cta{
-    margin-top:36px; padding:28px; border:1px solid var(--line); background:var(--panel);
+    margin-top:36px; padding:28px; border:1px solid var(--line); border-radius:18px; background:var(--panel);
     display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+    box-shadow:0 4px 16px rgba(18,33,63,0.06);
   }
-  .about-cta div h4{ font-size:17px; }
+  .about-cta div h4{ font-size:17px; font-family:'Baloo Da 2',sans-serif; }
   .about-cta div p{ margin-top:6px; font-size:13px; color:var(--muted); }
 </style>
 </head>
@@ -61,7 +70,10 @@
     <a href="contact.html">যোগাযোগ</a>
     <a class="cta-btn" href="index.html#classes">শুরু করো</a>
   </nav>
-  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="থিম বদলাও">🌙</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+  </div>
 </header>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html#classes">ক্লাসসমূহ</a>
@@ -122,6 +134,26 @@
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
       });
     }
+  })();
+
+  (function(){
+    var themeToggle = document.getElementById('themeToggle');
+    if(!themeToggle) return;
+
+    function isDark(){ return document.documentElement.getAttribute('data-theme') === 'dark'; }
+    function updateIcon(){ themeToggle.textContent = isDark() ? '☀️' : '🌙'; }
+    updateIcon();
+
+    themeToggle.addEventListener('click', function(){
+      var next = isDark() ? 'light' : 'dark';
+      if(next === 'dark'){
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try{ localStorage.setItem('aimers_theme', next); }catch(e){}
+      updateIcon();
+    });
   })();
 </script>
 <div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>

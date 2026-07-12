@@ -10,12 +10,25 @@
   --muted:#6B7280;
   --line:#E4E7EE;
 }
+html[data-theme="dark"]{
+  --bg:#0F1420;
+  --bg2:#171E2E;
+  --panel:#171E2E;
+  --cyan:#5B9EF0;
+  --magenta:#FF8A5C;
+  --purple:#A79BFF;
+  --yellow:#FFC94B;
+  --text:#F0F2F7;
+  --muted:#9AA3B8;
+  --line:#2A3348;
+}
 *{box-sizing:border-box; margin:0; padding:0;}
 html{scroll-behavior:smooth;}
 body{
   background:var(--bg); color:var(--text);
   font-family:'Hind Siliguri', sans-serif;
   overflow-x:hidden; position:relative;
+  transition:background .25s, color .25s;
 }
 .tech{font-family:'Hind Siliguri', sans-serif; letter-spacing:0.3px; font-weight:700;}
 
@@ -212,6 +225,14 @@ footer{
   align-items:center; justify-content:center; cursor:pointer; transition:border-color .2s, color .2s;
 }
 .menu-toggle:hover{ border-color:var(--cyan); color:var(--cyan); }
+.header-actions{ display:flex; align-items:center; gap:10px; }
+.theme-toggle{
+  background:none; border:1px solid var(--line); color:var(--text); border-radius:10px;
+  font-size:16px; min-width:44px; min-height:44px; padding:0;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:border-color .2s, color .2s, transform .2s;
+}
+.theme-toggle:hover{ border-color:var(--cyan); color:var(--cyan); transform:rotate(15deg); }
 .mobile-nav{
   display:none; flex-direction:column; border-bottom:1px solid var(--line); background:var(--bg2);
 }
@@ -408,3 +429,17 @@ footer.site-footer ul a:hover{ color:var(--cyan); }
 .state-screen.error .tech{ color:var(--magenta); }
 .state-screen p{ color:var(--muted); font-size:13px; max-width:440px; line-height:1.7; }
 .retry-btn{ margin-top:4px; }
+
+/* DARK MODE — কিছু জায়গায় সরাসরি hex রঙ ব্যবহার হয়েছিল (var() না), ডার্ক মোডে সেগুলো আলাদাভাবে override করা হচ্ছে */
+html[data-theme="dark"] .player-screen,
+html[data-theme="dark"] .recent-thumb{
+  background:linear-gradient(150deg,#1B2438,#212B42 55%,#28324C);
+}
+html[data-theme="dark"] .recent-thumb .play{ background:rgba(23,30,46,0.85); }
+html[data-theme="dark"] .eyebrow{ background:#1B2A44; }
+html[data-theme="dark"] .badge{ color:#FFC94B; background:#3A2E12; }
+html[data-theme="dark"] .mobile-nav a.mobile-cta{ color:#FFC94B; }
+html[data-theme="dark"] .chip:hover,
+html[data-theme="dark"] .chip.active{ background:#1B2A44; }
+html[data-theme="dark"] .search-result-item:hover{ background:#1B2A44; }
+html[data-theme="dark"] .chap.active{ background:#1B2A44; }

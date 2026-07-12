@@ -2,13 +2,21 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('aimers_theme');
+      if(saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    }catch(e){}
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>সম্পর্কে — Aimers</title>
-<meta name="description" content="Aimers কী, কাদের জন্য, এবং কেন বিনামূল্যে ক্লাস ৫ থেকে ১২ এর ভিডিও ক্লাস দেওয়া হচ্ছে — জানো এখানে।">
-<link rel="canonical" href="https://aimers-site.vercel.app/about.html">
+<title>যোগাযোগ — Aimers</title>
+<meta name="description" content="Aimers-এর সাথে যোগাযোগ করো ইমেইল, ইউটিউব বা ফেসবুকের মাধ্যমে।">
+<link rel="canonical" href="https://aimers-site.vercel.app/contact.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="সম্পর্কে — Aimers">
-<meta property="og:description" content="Aimers কী, কাদের জন্য, এবং কেন বিনামূল্যে ভিডিও ক্লাস দেওয়া হচ্ছে।">
+<meta property="og:title" content="যোগাযোগ — Aimers">
+<meta property="og:description" content="Aimers-এর সাথে যোগাযোগ করো ইমেইল, ইউটিউব বা ফেসবুকের মাধ্যমে।">
 <meta property="og:locale" content="bn_BD">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -27,28 +35,43 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "AIMERS", "item": "https://aimers-site.vercel.app/" },
-    { "@type": "ListItem", "position": 2, "name": "সম্পর্কে", "item": "https://aimers-site.vercel.app/about.html" }
+    { "@type": "ListItem", "position": 2, "name": "যোগাযোগ", "item": "https://aimers-site.vercel.app/contact.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Aimers",
+  "url": "https://aimers-site.vercel.app/",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "amraaimers@gmail.com",
+    "contactType": "customer support"
+  },
+  "sameAs": [
+    "https://www.youtube.com/@AIMERS-24h",
+    "https://www.facebook.com/aimer24h"
   ]
 }
 </script>
 <style>
-  .about-body{ padding:0 6vw 8vh; max-width:720px; }
-  .about-body p{ color:var(--muted); font-size:15.5px; line-height:1.9; margin-bottom:18px; }
-  .about-body p strong{ color:var(--text); font-weight:700; }
-
-  .why-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:16px; margin:32px 0 8px; }
-  .why-item{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 2px 10px rgba(18,33,63,0.04); }
-  .why-item .num{ color:var(--cyan); font-size:13px; font-weight:700; }
-  .why-item h4{ margin-top:8px; font-size:16px; font-weight:700; font-family:'Baloo Da 2',sans-serif; }
-  .why-item p{ margin-top:8px; font-size:13px; color:var(--muted); line-height:1.7; }
-
-  .about-cta{
-    margin-top:36px; padding:28px; border:1px solid var(--line); border-radius:18px; background:var(--panel);
-    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
-    box-shadow:0 4px 16px rgba(18,33,63,0.06);
+  .contact-grid{
+    padding:0 6vw 10vh;
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:18px;
+    max-width:900px;
   }
-  .about-cta div h4{ font-size:17px; font-family:'Baloo Da 2',sans-serif; }
-  .about-cta div p{ margin-top:6px; font-size:13px; color:var(--muted); }
+  .contact-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:26px;
+    display:flex; flex-direction:column; gap:14px; transition:transform .3s, border-color .3s, box-shadow .3s;
+    box-shadow:0 2px 10px rgba(18,33,63,0.04);
+  }
+  .contact-card:hover{ transform:translateY(-6px); border-color:var(--accent); box-shadow:0 16px 30px -10px rgba(18,33,63,0.16); }
+  .contact-card .subj-icon{ margin-bottom:0; }
+  .contact-card h4{ font-size:18px; font-weight:700; font-family:'Baloo Da 2',sans-serif; }
+  .contact-card .val{ font-size:14px; color:var(--muted); word-break:break-word; font-weight:600; }
+  .contact-card .go{ font-size:13px; font-weight:700; color:var(--accent); }
 </style>
 </head>
 <body>
@@ -62,7 +85,10 @@
     <a href="contact.html">যোগাযোগ</a>
     <a class="cta-btn" href="index.html#classes">শুরু করো</a>
   </nav>
-  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="থিম বদলাও">🌙</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+  </div>
 </header>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html#classes">ক্লাসসমূহ</a>
@@ -124,6 +150,26 @@
       });
     }
   })();
+
+  (function(){
+    var themeToggle = document.getElementById('themeToggle');
+    if(!themeToggle) return;
+
+    function isDark(){ return document.documentElement.getAttribute('data-theme') === 'dark'; }
+    function updateIcon(){ themeToggle.textContent = isDark() ? '☀️' : '🌙'; }
+    updateIcon();
+
+    themeToggle.addEventListener('click', function(){
+      var next = isDark() ? 'light' : 'dark';
+      if(next === 'dark'){
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try{ localStorage.setItem('aimers_theme', next); }catch(e){}
+      updateIcon();
+    });
+  })();
 </script>
 <div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>
 
@@ -131,43 +177,36 @@
 <div class="breadcrumb tech">
   <a href="index.html">AIMERS</a>
   <span class="sep">/</span>
-  <span class="current">সম্পর্কে</span>
+  <span class="current">যোগাযোগ</span>
 </div>
 
 <div class="page-head">
-  <div class="eyebrow tech">OUR MISSION</div>
-  <h1>Aimers কেন বানানো হয়েছে</h1>
+  <div class="eyebrow tech">GET IN TOUCH</div>
+  <h1>যোগাযোগ করো</h1>
+  <p>প্রশ্ন, পরামর্শ বা কোনো ভিডিওতে সমস্যা পেলে — নিচের যেকোনো মাধ্যমে জানাতে পারো।</p>
 </div>
 
-<div class="about-body">
-  <p><strong>Aimers</strong> একটা ফ্রি ভিডিও ক্লাস প্ল্যাটফর্ম, বাংলাদেশের ক্লাস ৫ থেকে ১২ এর শিক্ষার্থীদের জন্য বানানো। লক্ষ্য একটাই — চ্যাপ্টার অনুযায়ী সাজানো, পরিষ্কার ও সহজে বোঝা যায় এমন ভিডিও ক্লাস, যেটা যে কেউ যেকোনো জায়গা থেকে বিনামূল্যে দেখতে পারবে।</p>
-  <p>এটা <strong>AIMERS</strong> ইউটিউব চ্যানেলের একটা সম্প্রসারণ — চ্যানেলের ভিডিওগুলোকে এলোমেলোভাবে না রেখে, ক্লাস ও সাবজেক্ট অনুযায়ী গুছিয়ে রাখার একটা জায়গা, যাতে খুঁজে বের করতে সময় নষ্ট না হয়, সরাসরি শেখা শুরু করা যায়।</p>
+<div class="contact-grid">
+  <a class="contact-card" style="--accent:#2F7FE0" href="mailto:amraaimers@gmail.com">
+    <div class="subj-icon">✉</div>
+    <h4>ইমেইল</h4>
+    <div class="val">amraaimers@gmail.com</div>
+    <div class="go">মেইল করো →</div>
+  </a>
 
-  <div class="why-grid">
-    <div class="why-item">
-      <div class="num tech">01</div>
-      <h4>সম্পূর্ণ ফ্রি</h4>
-      <p>কোনো সাবস্ক্রিপশন বা লুকানো খরচ নেই — সব ভিডিও সবার জন্য উন্মুক্ত।</p>
-    </div>
-    <div class="why-item">
-      <div class="num tech">02</div>
-      <h4>চ্যাপ্টার-ভিত্তিক সাজানো</h4>
-      <p>এলোমেলো ভিডিও লিস্ট না — ক্লাস → সাবজেক্ট → চ্যাপ্টার, সহজে খুঁজে পাওয়ার মতো করে সাজানো।</p>
-    </div>
-    <div class="why-item">
-      <div class="num tech">03</div>
-      <h4>ক্রমাগত বাড়ছে</h4>
-      <p>নিয়মিত নতুন ক্লাস ও সাবজেক্ট যুক্ত হচ্ছে — এখনই যা আছে তার চেয়ে অনেক বেশি আসছে।</p>
-    </div>
-  </div>
+  <a class="contact-card" style="--accent:#E8622C" href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">
+    <div class="subj-icon">▶</div>
+    <h4>ইউটিউব চ্যানেল</h4>
+    <div class="val">@AIMERS-24h</div>
+    <div class="go">চ্যানেলে যাও →</div>
+  </a>
 
-  <div class="about-cta">
-    <div>
-      <h4>আরও ভিডিও দেখতে চাও?</h4>
-      <p>AIMERS ইউটিউব চ্যানেলে সরাসরি ঘুরে আসতে পারো।</p>
-    </div>
-    <a class="cta-btn" href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">চ্যানেলে যাও →</a>
-  </div>
+  <a class="contact-card" style="--accent:#7C6FE0" href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener">
+    <div class="subj-icon">f</div>
+    <h4>ফেসবুক পেইজ</h4>
+    <div class="val">facebook.com/aimer24h</div>
+    <div class="go">পেইজে যাও →</div>
+  </a>
 </div>
 
 <footer class="site-footer">

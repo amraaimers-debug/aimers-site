@@ -2,6 +2,14 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('aimers_theme');
+      if(saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    }catch(e){}
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>মানসিক স্বাস্থ্য — Aimers</title>
 <meta name="description" content="মানসিক স্বাস্থ্য নিয়ে মনোলগ ভিডিও সিরিজ — শিক্ষার্থীদের জন্য সহজ ভাষায়, বন্ধুর মতো করে বলা।">
@@ -83,6 +91,9 @@
     .skeleton-video-wrap{ grid-template-columns:1fr; }
   }
   .skeleton-video-wrap{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
+
+  html[data-theme="dark"] .ep-row:hover{ background:#241E3A; }
+  html[data-theme="dark"] .ep-row.active{ background:#2A2247; }
 </style>
 </head>
 <body>
@@ -96,7 +107,10 @@
     <a href="contact.html">যোগাযোগ</a>
     <a class="cta-btn" href="index.html#classes">শুরু করো</a>
   </nav>
-  <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+  <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="থিম বদলাও">🌙</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>
+  </div>
 </header>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html#classes">ক্লাসসমূহ</a>
@@ -157,6 +171,26 @@
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
       });
     }
+  })();
+
+  (function(){
+    var themeToggle = document.getElementById('themeToggle');
+    if(!themeToggle) return;
+
+    function isDark(){ return document.documentElement.getAttribute('data-theme') === 'dark'; }
+    function updateIcon(){ themeToggle.textContent = isDark() ? '☀️' : '🌙'; }
+    updateIcon();
+
+    themeToggle.addEventListener('click', function(){
+      var next = isDark() ? 'light' : 'dark';
+      if(next === 'dark'){
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try{ localStorage.setItem('aimers_theme', next); }catch(e){}
+      updateIcon();
+    });
   })();
 </script>
 <div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>

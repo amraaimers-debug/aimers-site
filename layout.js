@@ -146,7 +146,16 @@
     });
   }
 
+  // PWA: সার্ভিস ওয়ার্কার রেজিস্টার (শুধু https বা localhost-এ চলে; ব্যর্থ হলে সাইটে কোনো প্রভাব নেই)
+  function registerSW(){
+    if(!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+
   if(part === 'header'){
+    registerSW();
     script.insertAdjacentHTML('beforebegin', headerHtml());
     initMenu(); initTheme(); initOffline();
   } else if(part === 'footer'){

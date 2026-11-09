@@ -1,91 +1,156 @@
-import "./globals.css";
-import { Suspense } from "react";
-import ThemeToggle from "./ThemeToggle";
-import HeaderSearch from "./HeaderSearch";
+// ============================================================
+// AIMERS — শেয়ার্ড লেআউট (হেডার, মোবাইল মেনু, অফলাইন ব্যানার, ফুটার, উপরে-যাও বাটন)
+// আগে এগুলো ৭টা পেইজে কপি-পেস্ট করা ছিল। এখন একটাই জায়গা — এখানে বদলালে সব পেইজে বদলাবে।
+//
+// ব্যবহার: পেইজে দুই জায়গায় দুটো ট্যাগ বসে
+//   script ট্যাগ (src="layout.js" data-part="header")   — <body> এর শুরুতে
+//   script ট্যাগ (src="layout.js" data-part="footer")   — পেইজ কনটেন্টের শেষে, body বন্ধ হওয়ার আগে
+// স্ক্রিপ্টটা সিঙ্ক্রোনাস, তাই হেডার/ফুটার ঠিক ওই জায়গাতেই বসে — লেআউট শিফট হয় না।
+// ============================================================
+(function(){
+  var script = document.currentScript;
+  if(!script) return;
+  var part = script.getAttribute('data-part');
 
-export const metadata = {
-  metadataBase: new URL("https://amar-khata-web-iota.vercel.app"),
-  title: {
-    default: "আমার খাতা — কবিতা ও গল্পের ঘর",
-    template: "%s · আমার খাতা",
-  },
-  description: "কবিতা ও গল্পের একটি ব্যক্তিগত সংকলন",
-  openGraph: {
-    title: "আমার খাতা — কবিতা ও গল্পের ঘর",
-    description: "কবিতা ও গল্পের একটি ব্যক্তিগত সংকলন",
-    siteName: "আমার খাতা",
-    locale: "bn_BD",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
-};
+  // হোম পেইজে "ক্লাসসমূহ" লিংক শুধু #classes (রিলোড ছাড়াই স্ক্রল), অন্য পেইজে index.html#classes
+  var isHome = /(^\/$|\/index(\.html)?$)/.test(location.pathname);
+  var classesHref = isHome ? '#classes' : 'index.html#classes';
 
-export default function RootLayout({ children }) {
-  return (
-    <html lang="bn">
-      <body className="font-sans">
-        <header
-          className="sticky top-0 z-20"
-          style={{ background: "var(--surface)", borderBottom: "1px solid var(--line)" }}
-        >
-          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-            <a href="/" className="flex items-center gap-2.5">
-              <svg viewBox="0 0 40 40" width="32" height="32" fill="none">
-                <rect x="1" y="1" width="38" height="38" rx="6" stroke="#7C2233" strokeWidth="1.4" />
-                <path
-                  d="M20 12c-2.5-2.2-6-2.8-9-1.6v15.4c3-1.2 6.5-.6 9 1.6 2.5-2.2 6-2.8 9-1.6V10.4c-3-1.2-6.5-.6-9 1.6Z"
-                  stroke="#B4872E" strokeWidth="1.6"
-                />
-                <path d="M20 12v15.4" stroke="#B4872E" strokeWidth="1.6" />
-              </svg>
-              <div>
-                <div className="font-display text-xl leading-none">আমার খাতা</div>
-                <div className="text-[11px]" style={{ color: "var(--muted)" }}>সাহিত্য পোর্টাল</div>
-              </div>
-            </a>
-            <nav className="flex items-center gap-5 text-sm font-semibold">
-              <a href="/" className="hover:text-[var(--maroon)]">হোম</a>
-              <a href="/?type=কবিতা" className="hover:text-[var(--maroon)]">কবিতা</a>
-              <a href="/?type=গল্প" className="hover:text-[var(--maroon)]">গল্প</a>
-              <a href="/?type=দর্শন" className="hover:text-[var(--maroon)]">দর্শন</a>
-              <a href="/?type=শায়েরি" className="hover:text-[var(--maroon)]">শায়েরি</a>
-            </nav>
-            <div className="flex items-center gap-3">
-              <Suspense fallback={<div className="w-36 h-8" />}>
-                <HeaderSearch />
-              </Suspense>
-              <ThemeToggle />
-              <a
-                href="/settings"
-                className="text-sm font-semibold hover:text-[var(--maroon)]"
-                title="প্রোফাইল ছবি বদলান"
-              >
-                প্রোফাইল
-              </a>
-              <a
-                href="/publish"
-                className="text-sm font-bold px-4 py-2 rounded"
-                style={{ background: "var(--maroon)", color: "#fff" }}
-              >
-                লেখক লগইন
-              </a>
-            </div>
-          </div>
-        </header>
+  function headerHtml(){
+    return ''
+    + '<header>'
+    + '  <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>'
+    + '  <nav>'
+    + '    <a href="' + classesHref + '">ক্লাসসমূহ</a>'
+    + '    <a href="mental-health.html">মানসিক স্বাস্থ্য</a>'
+    + '    <a href="about.html">সম্পর্কে</a>'
+    + '    <a href="contact.html">যোগাযোগ</a>'
+    + '    <a class="cta-btn" href="' + classesHref + '">শুরু করো</a>'
+    + '  </nav>'
+    + '  <div class="header-actions">'
+    + '    <button class="theme-toggle" id="themeToggle" aria-label="থিম বদলাও">🌙</button>'
+    + '    <button class="menu-toggle" id="menuToggle" aria-label="মেনু">☰</button>'
+    + '  </div>'
+    + '</header>'
+    + '<div class="mobile-nav" id="mobileNav">'
+    + '  <a href="' + classesHref + '">ক্লাসসমূহ</a>'
+    + '  <a href="mental-health.html">মানসিক স্বাস্থ্য</a>'
+    + '  <a href="about.html">সম্পর্কে</a>'
+    + '  <a href="contact.html">যোগাযোগ</a>'
+    + '  <a class="mobile-cta" href="' + classesHref + '">শুরু করো</a>'
+    + '</div>'
+    + '<div class="offline-banner" id="offlineBanner" role="status">তুমি এখন অফলাইনে আছো — কিছু কনটেন্ট লোড নাও হতে পারে</div>';
+  }
 
-        <main className="max-w-5xl mx-auto px-6 py-8">{children}</main>
+  function footerHtml(){
+    // হোম পেইজে এই তালিকা index.html এর স্ক্রিপ্ট Sheet থেকে ভরে (#footerClassLinks)
+    var classLinks = isHome
+      ? '<ul id="footerClassLinks"></ul>'
+      : '<ul><li><a href="index.html#classes">সব ক্লাস দেখো →</a></li></ul>';
+    return ''
+    + '<footer class="site-footer">'
+    + '  <div class="f-brand">'
+    + '    <a href="index.html" class="logo tech"><span class="dot"></span>AIM<span>ERS</span></a>'
+    + '    <p>ক্লাস ৫ থেকে ১২ এর জন্য চ্যাপ্টার-ভিত্তিক ফ্রি ভিডিও ক্লাস — বাংলা, ইংলিশ, গণিত, বিজ্ঞান, আইসিটি।</p>'
+    + '    <div class="f-social">'
+    + '      <a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener" title="YouTube">▶</a>'
+    + '      <a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener" title="Facebook">f</a>'
+    + '      <a href="mailto:amraaimers@gmail.com" title="Email">✉</a>'
+    + '    </div>'
+    + '  </div>'
+    + '  <div><h5 class="tech">ক্লাসসমূহ</h5>' + classLinks + '</div>'
+    + '  <div>'
+    + '    <h5 class="tech">পেইজ</h5>'
+    + '    <ul>'
+    + '      <li><a href="index.html">হোম</a></li>'
+    + '      <li><a href="mental-health.html">মানসিক স্বাস্থ্য</a></li>'
+    + '      <li><a href="about.html">সম্পর্কে</a></li>'
+    + '      <li><a href="contact.html">যোগাযোগ</a></li>'
+    + '    </ul>'
+    + '  </div>'
+    + '  <div>'
+    + '    <h5 class="tech">যোগাযোগ</h5>'
+    + '    <ul>'
+    + '      <li><a href="mailto:amraaimers@gmail.com">amraaimers@gmail.com</a></li>'
+    + '      <li><a href="https://www.youtube.com/@AIMERS-24h" target="_blank" rel="noopener">@AIMERS-24h</a></li>'
+    + '      <li><a href="https://www.facebook.com/aimer24h" target="_blank" rel="noopener">facebook.com/aimer24h</a></li>'
+    + '    </ul>'
+    + '  </div>'
+    + '</footer>'
+    + '<div class="footer-bottom">'
+    + '  <div>© ২০২৬ Aimers</div>'
+    + '  <div class="tech">MADE IN BANGLADESH</div>'
+    + '</div>'
+    + '<button class="back-to-top" id="backToTop" aria-label="উপরে যাও">↑</button>';
+  }
 
-        <footer style={{ borderTop: "1px solid var(--line)", background: "var(--surface)" }}>
-          <div
-            className="max-w-5xl mx-auto px-6 py-6 text-center text-xs"
-            style={{ color: "var(--muted)" }}
-          >
-            আমার খাতা © {new Date().getFullYear()} · সর্বস্বত্ব সংরক্ষিত। এখানে প্রকাশিত প্রতিটি লেখার অধিকার তার নিজ নিজ লেখকের।
-          </div>
-        </footer>
-      </body>
-    </html>
-  );
-}
+  // ---------- হেডার সংক্রান্ত আচরণ ----------
+  function initMenu(){
+    var t = document.getElementById('menuToggle');
+    var m = document.getElementById('mobileNav');
+    if(!t || !m) return;
+
+    function closeMenu(){ m.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    function openMenu(){ m.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
+
+    t.setAttribute('aria-expanded', 'false');
+    t.setAttribute('aria-controls', 'mobileNav');
+
+    t.addEventListener('click', function(e){
+      e.stopPropagation();
+      m.classList.contains('open') ? closeMenu() : openMenu();
+    });
+    m.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeMenu); });
+    document.addEventListener('click', function(e){
+      if(m.classList.contains('open') && !m.contains(e.target) && e.target !== t) closeMenu();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && m.classList.contains('open')) closeMenu();
+    });
+  }
+
+  function initTheme(){
+    var themeToggle = document.getElementById('themeToggle');
+    if(!themeToggle) return;
+    function isDark(){ return document.documentElement.getAttribute('data-theme') === 'dark'; }
+    function updateIcon(){ themeToggle.textContent = isDark() ? '☀️' : '🌙'; }
+    updateIcon();
+    themeToggle.addEventListener('click', function(){
+      var next = isDark() ? 'light' : 'dark';
+      if(next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      else document.documentElement.removeAttribute('data-theme');
+      try{ localStorage.setItem('aimers_theme', next); }catch(e){}
+      updateIcon();
+    });
+  }
+
+  function initOffline(){
+    var banner = document.getElementById('offlineBanner');
+    if(!banner) return;
+    function update(){ banner.style.display = navigator.onLine ? 'none' : 'flex'; }
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    update();
+  }
+
+  // ---------- ফুটার সংক্রান্ত আচরণ ----------
+  function initBackToTop(){
+    var btn = document.getElementById('backToTop');
+    if(!btn) return;
+    window.addEventListener('scroll', function(){
+      btn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    btn.addEventListener('click', function(){
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+
+  if(part === 'header'){
+    script.insertAdjacentHTML('beforebegin', headerHtml());
+    initMenu(); initTheme(); initOffline();
+  } else if(part === 'footer'){
+    script.insertAdjacentHTML('beforebegin', footerHtml());
+    initBackToTop();
+  }
+})();

@@ -169,12 +169,7 @@
     try{
       episodes = await loadMentalHealth();
     } catch(err){
-      loadState.className = 'state-screen error';
-      loadState.innerHTML = `
-        <div class="tech">লোড করা যায়নি</div>
-        <p>Google Sheet-এ "MentalHealth" নামে একটা ট্যাব থাকা দরকার (কলাম: episode, title, youtube), আর Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা চেক করো।</p>
-        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
-      `;
+      renderLoadError(loadState, err);
       return;
     }
 

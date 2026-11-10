@@ -91,11 +91,59 @@ function extractYoutubeId(input){
   return s;
 }
 
+// Sheet-এর একটা ট্যাব CSV হিসেবে আনে।
+// সফল হলে সবশেষ কপি ব্রাউজারে সেভ রাখে; নেট না থাকলে/ব্যর্থ হলে ওই সেভ করা কপি দিয়ে চালায়,
+// ফলে ইউজার আগে একবার সাইট খুলে থাকলে অফলাইনেও ক্লাসের তালিকা দেখতে পায়।
+const SHEET_CACHE_PREFIX = 'aimers_sheet_';
+let DATA_FROM_CACHE = false;
+
+async function fetchSheetCsv(tabName, errorMessage){
+  try{
+    const res = await fetch(sheetUrl(tabName));
+    if(!res.ok){
+      const e = new Error(errorMessage);
+      e.isNetwork = false;
+      throw e;
+    }
+    const text = await res.text();
+    try{ localStorage.setItem(SHEET_CACHE_PREFIX + tabName, text); }catch(e){ /* জায়গা না থাকলে স্কিপ */ }
+    return text;
+  }catch(err){
+    if(err.isNetwork === undefined) err.isNetwork = true; // fetch নিজেই ব্যর্থ = নেটওয়ার্ক সমস্যা
+    let cached = null;
+    try{ cached = localStorage.getItem(SHEET_CACHE_PREFIX + tabName); }catch(e){}
+    if(cached){ DATA_FROM_CACHE = true; return cached; }
+    throw err;
+  }
+}
+
+// ডেটা লোড ব্যর্থ হলে ইউজারকে যা দেখানো হবে — সব পেইজ এটাই ব্যবহার করে।
+// Sheet/টেকনিক্যাল তথ্য ইউজারকে না দেখিয়ে ডেভেলপারের জন্য কনসোলে লেখা হয়।
+function renderLoadError(el, err){
+  console.error('[Aimers] ডেটা লোড ব্যর্থ:', err);
+  const offline = !navigator.onLine || (err && err.isNetwork);
+  const icon = offline
+    ? '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8a15 15 0 0 0-9.4-3.7M5 12.9a10 10 0 0 1 5.2-2.6M19 12.9a10 10 0 0 0-2.8-2M8.5 16.4a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"/></svg>'
+    : '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+  const title = offline ? 'ইন্টারনেট সংযোগ নেই' : 'কিছু একটা সমস্যা হয়েছে';
+  const msg = offline
+    ? 'ক্লাসের তালিকা আনতে ইন্টারনেট লাগে। সংযোগ চালু আছে কিনা দেখে আবার চেষ্টা করো — সংযোগ ফিরলে নিজে থেকেই পেইজ রিলোড হবে।'
+    : 'এই মুহূর্তে ক্লাসের তালিকা আনা যাচ্ছে না। একটু পরে আবার চেষ্টা করো। সমস্যা থাকলে amraaimers@gmail.com-এ জানাতে পারো।';
+  el.className = 'state-screen error';
+  el.innerHTML =
+    '<div class="state-icon">' + icon + '</div>' +
+    '<h2 class="state-title">' + title + '</h2>' +
+    '<p>' + msg + '</p>' +
+    '<button class="cta-btn retry-btn" type="button">আবার চেষ্টা করো</button>';
+  el.querySelector('.retry-btn').addEventListener('click', function(){ location.reload(); });
+  if(offline) window.addEventListener('online', function(){ location.reload(); }, { once: true });
+}
+
 // Google Sheet থেকে Classes ও Chapters — দুটোই fetch করে গ্লোবাল ভ্যারিয়েবলে বসায়
 async function loadData(){
   const [classesCsv, chaptersCsv] = await Promise.all([
-    fetch(sheetUrl('Classes')).then(r => { if(!r.ok) throw new Error('Classes ট্যাব পড়া যায়নি'); return r.text(); }),
-    fetch(sheetUrl('Chapters')).then(r => { if(!r.ok) throw new Error('Chapters ট্যাব পড়া যায়নি'); return r.text(); }),
+    fetchSheetCsv('Classes', 'Classes ট্যাব পড়া যায়নি'),
+    fetchSheetCsv('Chapters', 'Chapters ট্যাব পড়া যায়নি'),
   ]);
 
   CLASSES = parseCSV(classesCsv).map(r => ({
@@ -132,10 +180,7 @@ async function loadData(){
 // কলাম: episode, title, youtube
 // ============================================================
 async function loadMentalHealth(){
-  const csv = await fetch(sheetUrl('MentalHealth')).then(r => {
-    if(!r.ok) throw new Error('MentalHealth ট্যাব পড়া যায়নি');
-    return r.text();
-  });
+  const csv = await fetchSheetCsv('MentalHealth', 'MentalHealth ট্যাব পড়া যায়নি');
   return parseCSV(csv)
     .map(r => ({
       episode: r.episode || '',

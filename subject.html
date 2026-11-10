@@ -78,12 +78,8 @@
     try{
       await loadData();
     } catch(err){
-      loadState.className = 'state-screen error';
-      loadState.innerHTML = `
-        <div class="tech">লোড করা যায়নি</div>
-        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
-        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
-      `;
+      document.getElementById('subjCount').textContent = '';
+      renderLoadError(loadState, err);
       return;
     }
 

@@ -187,12 +187,15 @@
   </div>
 </section>
 <script>
-  // শুধু Android-এ এবং অ্যাপ/ইনস্টল করা মোডের বাইরে থাকলে ডাউনলোড বাটন দেখাবে
+  // অ্যাপ/ইনস্টল করা মোডে থাকলে কার্ড লুকানো থাকে; সব ডিভাইসে দেখায়, তবে Android ছাড়া অন্য ডিভাইসে আলাদা নোট বসে
   (function(){
     try{
       var standalone = window.matchMedia('(display-mode: standalone)').matches || document.referrer.indexOf('android-app://') === 0;
-      if(/Android/i.test(navigator.userAgent) && !standalone){
-        document.getElementById('appPromo').style.display = '';
+      if(standalone) return;
+      document.getElementById('appPromo').style.display = '';
+      if(!/Android/i.test(navigator.userAgent)){
+        var note = document.querySelector('#appPromo .app-promo-note');
+        if(note) note.textContent = 'এই APK শুধু Android ফোনে চলে। ফোনে এই পেইজ খুলে ডাউনলোড করো, অথবা এখান থেকে নামিয়ে ফোনে পাঠিয়ে দাও। আইফোনে Safari-তে Share → Add to Home Screen ব্যবহার করো।';
       }
     }catch(e){}
   })();

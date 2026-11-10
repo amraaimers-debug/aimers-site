@@ -443,3 +443,19 @@ html[data-theme="dark"] .chip:hover,
 html[data-theme="dark"] .chip.active{ background:#1B2A44; }
 html[data-theme="dark"] .search-result-item:hover{ background:#1B2A44; }
 html[data-theme="dark"] .chap.active{ background:#1B2A44; }
+
+/* ===== FAQ (হোম পেইজ) ===== */
+.faq-list{ display:flex; flex-direction:column; gap:10px; max-width:820px; }
+.faq-item{ background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+.faq-item summary{
+  list-style:none; cursor:pointer; padding:16px 48px 16px 18px; position:relative;
+  font-family:'Baloo Da 2',sans-serif; font-size:16px; font-weight:600; color:var(--text); min-height:44px;
+}
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::after{
+  content:'+'; position:absolute; right:18px; top:50%; transform:translateY(-50%);
+  font-size:22px; font-weight:500; color:var(--cyan); line-height:1;
+}
+.faq-item[open] summary::after{ content:'−'; }
+.faq-item summary:focus-visible{ outline:2px solid var(--cyan); outline-offset:-2px; }
+.faq-item p{ padding:0 18px 18px; font-size:14.5px; line-height:1.85; color:var(--muted); }

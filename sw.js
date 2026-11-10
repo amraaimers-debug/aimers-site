@@ -3,7 +3,7 @@
 // নেটওয়ার্ক না থাকলে সবশেষ সেভ করা কপি দেখায়।
 // Google Sheet, YouTube, ফন্ট — এগুলো অন্য ডোমেইনের, তাই এখানে কখনো ক্যাশ হয় না (ডেটা সবসময় লাইভ থাকে)।
 // ক্যাশ ভার্সন বদলাতে চাইলে CACHE নামের সংখ্যা বাড়াও।
-var CACHE = 'aimers-v1';
+var CACHE = 'aimers-v2';
 var SHELL = [
   'index.html', 'subject.html', 'video.html', 'about.html', 'contact.html',
   'mental-health.html', '404.html', 'style.css', 'data.js', 'layout.js',
@@ -32,6 +32,7 @@ self.addEventListener('fetch', function(e){
   if(req.method !== 'GET') return;
   var url = new URL(req.url);
   if(url.origin !== self.location.origin) return; // Sheet/YouTube/ফন্ট — ছোঁয়া হয় না
+  if(/\.apk$/i.test(url.pathname)) return; // বড় APK ফাইল ক্যাশ হবে না, সরাসরি ডাউনলোড হবে
 
   e.respondWith(
     fetch(req).then(function(res){

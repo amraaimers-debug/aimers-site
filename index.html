@@ -176,6 +176,28 @@
   <div class="recent-grid" id="recentGrid"></div>
 </section>
 
+<section class="section-wrap app-promo" id="appPromo" style="display:none;">
+  <div class="app-promo-card">
+    <div class="app-promo-text">
+      <h2>Aimers অ্যাপ ডাউনলোড করো</h2>
+      <p>ফোনের হোম স্ক্রিন থেকে এক ট্যাপেই ক্লাস খোলো। অ্যাপটা সম্পূর্ণ ফ্রি, আর সাইটে নতুন ভিডিও এলে অ্যাপেও নিজে থেকেই আসে।</p>
+      <p class="app-promo-note">ইনস্টলের সময় ফোন "অজানা সোর্স" থেকে ইনস্টলের অনুমতি চাইলে অনুমতি দাও। শুধু Android ফোনের জন্য।</p>
+    </div>
+    <a class="cta-btn" href="aimers.apk" download="Aimers.apk">অ্যাপ ডাউনলোড (APK)</a>
+  </div>
+</section>
+<script>
+  // শুধু Android-এ এবং অ্যাপ/ইনস্টল করা মোডের বাইরে থাকলে ডাউনলোড বাটন দেখাবে
+  (function(){
+    try{
+      var standalone = window.matchMedia('(display-mode: standalone)').matches || document.referrer.indexOf('android-app://') === 0;
+      if(/Android/i.test(navigator.userAgent) && !standalone){
+        document.getElementById('appPromo').style.display = '';
+      }
+    }catch(e){}
+  })();
+</script>
+
 <section class="section-wrap" id="faq">
   <div class="section-head">
     <h2>সাধারণ প্রশ্ন</h2>
@@ -327,12 +349,8 @@
     try{
       await loadData();
     } catch(err){
-      loadState.className = 'state-screen error';
-      loadState.innerHTML = `
-        <div class="tech">লোড করা যায়নি</div>
-        <p>Google Sheet থেকে ডেটা আনতে সমস্যা হয়েছে। Sheet-টা "Anyone with the link — Viewer" করা আছে কিনা, আর ট্যাবের নাম ঠিক "Classes" ও "Chapters" আছে কিনা চেক করো।</p>
-        <button class="cta-btn retry-btn" onclick="location.reload()">আবার চেষ্টা করো</button>
-      `;
+      subjCount.textContent = '';
+      renderLoadError(loadState, err);
       return;
     }
 
